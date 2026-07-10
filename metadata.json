@@ -1,0 +1,6 @@
+{
+  "name": "Oumar Habits",
+  "description": "A premium, fully functional habit tracking application featuring AI coaching, mood tracking, school planning, and focus timers.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

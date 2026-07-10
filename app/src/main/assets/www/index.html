@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Oumar Habits</title>
+    <!-- Manifest & PWA -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#121214">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- App Container -->
+    <div class="app-container">
+        
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-logo">
+                <span class="material-symbols-outlined logo-icon">blur_on</span>
+                <div class="logo-text">
+                    <h1>Oumar Habits</h1>
+                    <span class="logo-subtitle">Elevate Your Life</span>
+                </div>
+            </div>
+            
+            <div class="header-stats">
+                <div class="header-stat-badge" title="Productivity Score" id="header-productivity-btn">
+                    <span class="material-symbols-outlined icon-score">electric_bolt</span>
+                    <span id="header-productivity-score">85</span>
+                </div>
+                <div class="header-stat-badge" title="Current Daily Streak">
+                    <span class="material-symbols-outlined icon-streak">local_fire_department</span>
+                    <span id="header-streak-count">0</span>
+                </div>
+                <button id="theme-toggle" class="icon-button" aria-label="Toggle Theme">
+                    <span class="material-symbols-outlined">light_mode</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Body (Navigation + Content) -->
+        <div class="app-main">
+            <!-- Sidebar Navigation (Desktop/Tablet) -->
+            <nav class="app-sidebar">
+                <button class="nav-item active" data-tab="dashboard">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-tab="habits">
+                    <span class="material-symbols-outlined">pageview</span>
+                    <span>Habits</span>
+                </button>
+                <button class="nav-item" data-tab="pomodoro">
+                    <span class="material-symbols-outlined">timer</span>
+                    <span>Focus Timer</span>
+                </button>
+                <button class="nav-item" data-tab="school">
+                    <span class="material-symbols-outlined">school</span>
+                    <span>School Planner</span>
+                </button>
+                <button class="nav-item" data-tab="prayers">
+                    <span class="material-symbols-outlined">mosque</span>
+                    <span>Prayers & Anchors</span>
+                </button>
+                <button class="nav-item" data-tab="journal">
+                    <span class="material-symbols-outlined">edit_note</span>
+                    <span>Mood & Journal</span>
+                </button>
+                <button class="nav-item" data-tab="ai-coach">
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <span>AI Habit Coach</span>
+                </button>
+                <button class="nav-item" data-tab="challenges">
+                    <span class="material-symbols-outlined">workspace_premium</span>
+                    <span>Challenges</span>
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <!-- Screen Content Area -->
+            <main class="app-content">
+                
+                <!-- 1. DASHBOARD SCREEN -->
+                <section id="tab-dashboard" class="tab-panel active">
+                    <div class="welcome-banner">
+                        <div class="welcome-text">
+                            <h2 id="welcome-title">Good morning, Oumar!</h2>
+                            <p id="welcome-subtitle">Let's make today count. Complete your routines and boost your score!</p>
+                        </div>
+                        <div class="welcome-illustration">
+                            <span class="material-symbols-outlined hero-art">rocket_launch</span>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Widgets Grid -->
+                    <div class="widgets-grid">
+                        
+                        <!-- Daily Checklist & Today's Highlight -->
+                        <div class="widget-card col-span-2">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined">today</span>
+                                    <h3>Today's Routine</h3>
+                                </div>
+                                <div class="widget-actions">
+                                    <span class="badge" id="today-completion-badge">0/0 completed</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Routine Filter Tabs -->
+                            <div class="routine-filter">
+                                <button class="filter-btn active" data-routine="all">All</button>
+                                <button class="filter-btn" data-routine="morning">
+                                    <span class="material-symbols-outlined">wb_sunny</span> Morning
+                                </button>
+                                <button class="filter-btn" data-routine="evening">
+                                    <span class="material-symbols-outlined">nights_stay</span> Evening
+                                </button>
+                            </div>
+
+                            <div id="dashboard-today-list" class="today-habits-list">
+                                <!-- Populated dynamically -->
+                                <div class="empty-state">
+                                    <span class="material-symbols-outlined">check_circle</span>
+                                    <p>No habits active for today. Create some first!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Productivity & Insights Widget -->
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined">analytics</span>
+                                    <h3>Productivity Meter</h3>
+                                </div>
+                            </div>
+                            <div class="productivity-widget-content">
+                                <div class="score-circle-container">
+                                    <div class="score-circle" id="dashboard-score-circle" style="--score-pct: 85%;">
+                                        <div class="score-inner">
+                                            <span class="score-val" id="dashboard-score-val">85</span>
+                                            <span class="score-lbl">Score</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="score-breakdown">
+                                    <div class="score-metric">
+                                        <span>Habits</span>
+                                        <div class="progress-bar-sm"><div class="bar-fill" id="breakdown-habits-fill" style="width: 80%"></div></div>
+                                        <span id="breakdown-habits-val">80%</span>
+                                    </div>
+                                    <div class="score-metric">
+                                        <span>Focus</span>
+                                        <div class="progress-bar-sm"><div class="bar-fill" id="breakdown-focus-fill" style="width: 90%"></div></div>
+                                        <span id="breakdown-focus-val">90%</span>
+                                    </div>
+                                    <div class="score-metric">
+                                        <span>School</span>
+                                        <div class="progress-bar-sm"><div class="bar-fill" id="breakdown-school-fill" style="width: 70%"></div></div>
+                                        <span id="breakdown-school-val">70%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Calendar Heatmap Widget -->
+                        <div class="widget-card col-span-3">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined">calendar_month</span>
+                                    <h3>Consistency Heatmap</h3>
+                                </div>
+                                <div class="widget-actions">
+                                    <span id="heatmap-month-label" class="bold-label">July 2026</span>
+                                </div>
+                            </div>
+                            <div class="heatmap-container">
+                                <div class="heatmap-weekdays">
+                                    <div>S</div><div>M</div><div>T</div><div>W</div><div>T</div><div>F</div><div>S</div>
+                                </div>
+                                <div id="calendar-heatmap-grid" class="heatmap-grid">
+                                    <!-- Populated dynamically (35 spaces representing days) -->
+                                </div>
+                                <div class="heatmap-legend">
+                                    <span>Missed</span>
+                                    <div class="legend-box level-0"></div>
+                                    <div class="legend-box level-1"></div>
+                                    <div class="legend-box level-2"></div>
+                                    <div class="legend-box level-3"></div>
+                                    <div class="legend-box level-4"></div>
+                                    <span>Perfect Day</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Focus & Mood -->
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined" style="color: var(--primary-color);">sentiment_satisfied</span>
+                                    <h3>Triple Mood Check-In</h3>
+                                </div>
+                            </div>
+                            <div id="dashboard-mood-container" style="padding-top: 4px;">
+                                <!-- Rendered dynamically by renderTripleMoodChecks -->
+                            </div>
+                        </div>
+
+                        <!-- School Tasks Highlights -->
+                        <div class="widget-card col-span-2">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined">assignment</span>
+                                    <h3>School Planner Highlights</h3>
+                                </div>
+                                <div class="widget-actions">
+                                    <button class="text-btn btn-go-tab" data-target="school">Open Planner</button>
+                                </div>
+                            </div>
+                            <div id="dashboard-school-tasks" class="dashboard-school-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Personal Insights & Motivation -->
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined">lightbulb</span>
+                                    <h3>Personal Insights</h3>
+                                </div>
+                            </div>
+                            <div class="insights-container" id="dashboard-insights">
+                                <div class="insight-item">
+                                    <span class="material-symbols-outlined text-accent">workspace_premium</span>
+                                    <div>
+                                        <h4 id="insight-streak-title">No Active Streaks</h4>
+                                        <p id="insight-streak-desc">Consistency is key! Keep going.</p>
+                                    </div>
+                                </div>
+                                <div class="insight-item">
+                                    <span class="material-symbols-outlined text-primary">calendar_today</span>
+                                    <div>
+                                        <h4 id="insight-bestday-title">Analysis Loading</h4>
+                                        <p id="insight-bestday-desc">Based on your tracking logs.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Daily Prayers & Anchors Summary Widget -->
+                        <div class="widget-card col-span-2">
+                            <div class="widget-header">
+                                <div class="widget-title">
+                                    <span class="material-symbols-outlined" style="color: var(--warning-color);">mosque</span>
+                                    <h3>Daily Anchors & Prayers Progress</h3>
+                                </div>
+                                <div class="widget-actions">
+                                    <button class="text-btn btn-go-tab" data-target="prayers">Open Prayers</button>
+                                </div>
+                            </div>
+                            <div class="prayers-summary-widget-content" style="display: flex; flex-direction: column; gap: 12px; margin-top: 8px;">
+                                <div style="display: flex; justify-content: space-between; align-items: center; background: var(--bg-primary); padding: 10px 12px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                    <span style="font-size: 13px; font-weight: 500; color: var(--text-secondary);" id="dash-next-prayer-lbl">Next Prayer: Fajr</span>
+                                    <span style="font-size: 13px; font-weight: 700; color: var(--warning-color);" id="dash-next-prayer-countdown">--:--</span>
+                                </div>
+                                
+                                <div class="prayers-bubbles-container" style="display: flex; justify-content: space-between; gap: 8px; margin-top: 4px;">
+                                    <!-- Populated dynamically: 5 bubbles for Fajr, Dhuhr, Asr, Maghrib, Isha -->
+                                    <div class="prayer-bubble-item" id="bubble-card-fajr" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; background: var(--bg-primary); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Fajr</span>
+                                        <span class="material-symbols-outlined" id="bubble-fajr" style="font-size: 18px; color: var(--text-tertiary);">radio_button_unchecked</span>
+                                    </div>
+                                    <div class="prayer-bubble-item" id="bubble-card-dhuhr" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; background: var(--bg-primary); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Dhuhr</span>
+                                        <span class="material-symbols-outlined" id="bubble-dhuhr" style="font-size: 18px; color: var(--text-tertiary);">radio_button_unchecked</span>
+                                    </div>
+                                    <div class="prayer-bubble-item" id="bubble-card-asr" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; background: var(--bg-primary); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Asr</span>
+                                        <span class="material-symbols-outlined" id="bubble-asr" style="font-size: 18px; color: var(--text-tertiary);">radio_button_unchecked</span>
+                                    </div>
+                                    <div class="prayer-bubble-item" id="bubble-card-maghrib" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; background: var(--bg-primary); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Maghrib</span>
+                                        <span class="material-symbols-outlined" id="bubble-maghrib" style="font-size: 18px; color: var(--text-tertiary);">radio_button_unchecked</span>
+                                    </div>
+                                    <div class="prayer-bubble-item" id="bubble-card-isha" style="flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 8px 4px; background: var(--bg-primary); border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                        <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Isha</span>
+                                        <span class="material-symbols-outlined" id="bubble-isha" style="font-size: 18px; color: var(--text-tertiary);">radio_button_unchecked</span>
+                                    </div>
+                                </div>
+                                
+                                <div id="dash-fajr-wake-status" style="font-size: 11px; font-weight: 600; color: var(--accent-color); text-align: center; margin-top: 4px; display: none;">
+                                    🌅 Sunrise Master: You woke up on time for Fajr today! +25 XP
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </section>
+
+                <!-- 2. HABITS SCREEN -->
+                <section id="tab-habits" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Habit Vault</h2>
+                            <p>Build routines, break bad behaviors, and level up.</p>
+                        </div>
+                        <button id="add-habit-btn" class="primary-button">
+                            <span class="material-symbols-outlined">add</span> Create Habit
+                        </button>
+                    </div>
+
+                    <!-- Filter Controls -->
+                    <div class="habits-toolbar">
+                        <div class="search-box">
+                            <span class="material-symbols-outlined search-icon">search</span>
+                            <input type="text" id="habit-search" placeholder="Search habits...">
+                        </div>
+                        
+                        <div class="toolbar-filters">
+                            <select id="habit-category-filter">
+                                <option value="all">All Categories</option>
+                                <!-- Categories populated dynamically -->
+                            </select>
+                            
+                            <select id="habit-status-filter">
+                                <option value="active">Active Habits</option>
+                                <option value="archived">Archived Habits</option>
+                                <option value="all">All Habits</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Habit Lists -->
+                    <div class="habits-layout">
+                        <!-- Category Sections or List -->
+                        <div id="habits-list-container" class="habits-list-grid">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 3. FOCUS TIMER SCREEN -->
+                <section id="tab-pomodoro" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Pomodoro Focus Timer</h2>
+                            <p>Train your concentration, track deep work hours, and attach sessions to your habits.</p>
+                        </div>
+                    </div>
+
+                    <div class="pomodoro-container">
+                        <div class="timer-card">
+                            <!-- Active Habit Linker -->
+                            <div class="timer-habit-selector">
+                                <label for="timer-habit-link">Link session to habit:</label>
+                                <select id="timer-habit-link">
+                                    <option value="">No habit (General Focus)</option>
+                                    <!-- Habits populated dynamically -->
+                                </select>
+                            </div>
+
+                            <!-- Big Timer Display -->
+                            <div class="timer-display-container">
+                                <svg class="timer-ring-svg" viewBox="0 0 200 200">
+                                    <circle class="timer-ring-bg" cx="100" cy="100" r="90"></circle>
+                                    <circle class="timer-ring-progress" id="timer-progress-ring" cx="100" cy="100" r="90" style="stroke-dasharray: 565.48; stroke-dashoffset: 0;"></circle>
+                                </svg>
+                                <div class="timer-time" id="timer-time-display">25:00</div>
+                                <div class="timer-mode-label" id="timer-mode-lbl">Focus Session</div>
+                            </div>
+
+                            <!-- Mode Selectors -->
+                            <div class="timer-modes">
+                                <button class="timer-mode-btn active" data-mode="focus">Pomodoro</button>
+                                <button class="timer-mode-btn" data-mode="short-break">Short Break</button>
+                                <button class="timer-mode-btn" data-mode="long-break">Long Break</button>
+                            </div>
+
+                            <!-- Controls -->
+                            <div class="timer-controls">
+                                <button id="timer-reset" class="icon-button-lg" title="Reset">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                </button>
+                                <button id="timer-play-pause" class="timer-play-btn" title="Start">
+                                    <span class="material-symbols-outlined" id="timer-play-icon">play_arrow</span>
+                                </button>
+                                <button id="timer-skip" class="icon-button-lg" title="Skip Session">
+                                    <span class="material-symbols-outlined">skip_next</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Focus Analytics Widget -->
+                        <div class="timer-stats-card">
+                            <h3>Focus Analytics</h3>
+                            <div class="timer-stats-grid">
+                                <div class="stat-box">
+                                    <span class="stat-value" id="focus-sessions-count">0</span>
+                                    <span class="stat-label">Sessions Completed</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-value" id="focus-time-count">0m</span>
+                                    <span class="stat-label">Deep Focus Time</span>
+                                </div>
+                            </div>
+
+                            <!-- Recent focus logs -->
+                            <h4 class="sub-header">Today's Sessions</h4>
+                            <div id="focus-logs-list" class="focus-logs-list" style="margin-bottom: 16px;">
+                                <div class="empty-state-sm">No focus sessions logged today yet.</div>
+                            </div>
+                        </div>
+
+                        <!-- Android Control & Accountability Device Simulator Card -->
+                        <div class="timer-stats-card">
+                            <h3 style="display: flex; align-items: center; gap: 8px;">
+                                <span class="material-symbols-outlined" style="color: var(--primary-color);">shield</span> 
+                                Android Accountability Engine
+                            </h3>
+                            <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px;">
+                                Customize your personal operating system strictness level. Test blocks by simulating app launches below.
+                            </p>
+                            
+                            <!-- Accountability level buttons -->
+                            <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px;">
+                                <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Select Accountability Strictness</label>
+                                <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px;">
+                                    <button class="text-btn btn-strictness" id="btn-strict-1" data-level="1" style="font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); padding: 8px 4px; border-radius: var(--border-radius-sm); text-align: center;">Lvl 1</button>
+                                    <button class="text-btn btn-strictness" id="btn-strict-2" data-level="2" style="font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); padding: 8px 4px; border-radius: var(--border-radius-sm); text-align: center;">Lvl 2</button>
+                                    <button class="text-btn btn-strictness" id="btn-strict-3" data-level="3" style="font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); padding: 8px 4px; border-radius: var(--border-radius-sm); text-align: center;">Lvl 3</button>
+                                    <button class="text-btn btn-strictness" id="btn-strict-4" data-level="4" style="font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); padding: 8px 4px; border-radius: var(--border-radius-sm); text-align: center;">Lvl 4</button>
+                                    <button class="text-btn btn-strictness" id="btn-strict-5" data-level="5" style="font-size: 11px; font-weight: 700; border: 1px solid var(--border-color); padding: 8px 4px; border-radius: var(--border-radius-sm); text-align: center; color: var(--danger-color); border-color: rgba(239, 68, 68, 0.4);">Lvl 5 💀</button>
+                                </div>
+                                <div id="strictness-description" style="font-size: 11px; background: var(--bg-primary); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); line-height: 1.4; color: var(--text-secondary);">
+                                    Description of current strictness level.
+                                </div>
+                            </div>
+
+                            <!-- Distraction App Launcher Sandbox -->
+                            <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 12px;">
+                                <h4 style="font-size: 11px; font-weight: 700; color: var(--danger-color); margin-bottom: 8px; display: flex; align-items: center; gap: 4px;">
+                                    <span class="material-symbols-outlined" style="font-size: 14px;">app_blocking</span> Distraction Sandbox (Simulate Opening App)
+                                </h4>
+                                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px;">
+                                    <button class="text-btn btn-simulate-distraction" data-app="TikTok" style="font-size: 10px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); font-weight: 600; background: var(--bg-secondary); cursor: pointer;">🎵 TikTok</button>
+                                    <button class="text-btn btn-simulate-distraction" data-app="Instagram" style="font-size: 10px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); font-weight: 600; background: var(--bg-secondary); cursor: pointer;">📸 Instagram</button>
+                                    <button class="text-btn btn-simulate-distraction" data-app="YouTube" style="font-size: 10px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); font-weight: 600; background: var(--bg-secondary); cursor: pointer;">📺 YouTube</button>
+                                    <button class="text-btn btn-simulate-distraction" data-app="Gmail" style="font-size: 10px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); font-weight: 600; background: var(--bg-secondary); cursor: pointer;">✉️ Gmail</button>
+                                </div>
+                                <div id="distraction-feedback-message" style="font-size: 11px; font-weight: 700; min-height: 16px; text-align: center; margin-top: 8px;"></div>
+                            </div>
+
+                            <!-- Real-time distraction history list -->
+                            <h4 style="font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">
+                                <span class="material-symbols-outlined" style="font-size: 14px;">history</span> Distraction Attempt Log
+                            </h4>
+                            <div id="distraction-logs-container" style="display: flex; flex-direction: column; gap: 6px; max-height: 120px; overflow-y: auto;">
+                                <div class="empty-state-sm" style="font-size: 10px;">Sandbox history empty. Simulate an access above.</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4. SCHOOL PLANNER SCREEN -->
+                <section id="tab-school" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>School Planner</h2>
+                            <p>Organize homework, quizzes, projects, exams, and milestones.</p>
+                        </div>
+                        <button id="add-school-task-btn" class="primary-button">
+                            <span class="material-symbols-outlined">add</span> Add Task
+                        </button>
+                    </div>
+
+                    <div class="school-layout">
+                        <!-- Kanban / List view -->
+                        <div class="school-toolbar">
+                            <div class="planner-filters">
+                                <button class="filter-btn active" data-school-filter="all">All Tasks</button>
+                                <button class="filter-btn" data-school-filter="homework">Homework</button>
+                                <button class="filter-btn" data-school-filter="quiz">Quizzes</button>
+                                <button class="filter-btn" data-school-filter="project">Projects</button>
+                                <button class="filter-btn" data-school-filter="exam">Exams</button>
+                            </div>
+                        </div>
+
+                        <div class="school-columns">
+                            <!-- Column 1: Upcoming Tasks -->
+                            <div class="school-column">
+                                <div class="column-header">
+                                    <span class="dot yellow"></span>
+                                    <h3>To Do</h3>
+                                    <span class="task-count" id="todo-tasks-count">0</span>
+                                </div>
+                                <div id="school-todo-list" class="school-task-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Column 2: Completed Tasks -->
+                            <div class="school-column">
+                                <div class="column-header">
+                                    <span class="dot green"></span>
+                                    <h3>Completed</h3>
+                                    <span class="task-count" id="completed-tasks-count">0</span>
+                                </div>
+                                <div id="school-completed-list" class="school-task-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 4.5 PRAYERS & ANCHORS SCREEN -->
+                <section id="tab-prayers" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Prayers & Anchor Points</h2>
+                            <p>Utilize your daily prayers as environmental anchors to stack habits, based on James Clear's Atomic Habits.</p>
+                        </div>
+                        <div class="location-badge" style="background-color: var(--primary-light); color: var(--primary-color); padding: 6px 12px; border-radius: var(--border-radius-md); font-size: 11px; font-weight: 700; display: flex; align-items: center; gap: 4px;">
+                            <span class="material-symbols-outlined" style="font-size: 14px;">location_on</span> Bronx, NYC
+                        </div>
+                    </div>
+
+                    <!-- Active Countdown Widget -->
+                    <div class="welcome-banner" style="background: linear-gradient(135deg, #1E1B4B 0%, #311042 100%); margin-bottom: 24px; padding: 20px;">
+                        <div class="welcome-text">
+                            <h3 style="font-size: 18px; font-weight: 800; color: #FFF; margin-bottom: 4px;">Next Anchor Alert</h3>
+                            <p id="next-prayer-countdown-text" style="color: #E0E7FF; font-size: 14px; font-weight: 500;">Calculating next prayer...</p>
+                        </div>
+                        <div class="welcome-illustration">
+                            <span class="material-symbols-outlined hero-art" style="color: var(--warning-color); animation: pulse 3s infinite;">mosque</span>
+                        </div>
+                    </div>
+
+                    <div class="widgets-grid" style="grid-template-columns: 1fr;">
+                        
+                        <!-- Timeline Card -->
+                        <div class="widget-card">
+                            <div class="widget-header">
+                                <h3>🕌 Daily Anchor Timeline</h3>
+                                <span id="prayer-date-lbl" style="font-size: 12px; color: var(--text-secondary); font-weight: 600;">Today</span>
+                            </div>
+                            
+                            <div class="prayer-timeline" id="prayer-timeline-container" style="display: flex; flex-direction: column; gap: 16px; margin-top: 12px;">
+                                <!-- Filled dynamically by renderPrayersScreen() -->
+                            </div>
+                        </div>
+
+                        <!-- Atomic Habit Stacking Manager Card -->
+                        <div class="widget-card" style="margin-top: 16px;">
+                            <div class="widget-header">
+                                <h3>🔗 Atomic Habit Stacker</h3>
+                                <span class="badge" style="background-color: var(--primary-light); color: var(--primary-color);">Atomic Habits</span>
+                             </div>
+                             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 16px; line-height: 1.5;">
+                                 <strong>Habit Stacking Principle:</strong> "After [CURRENT ANCHOR], I will [NEW HABIT]." Link your custom habits to specific daily prayer times or school schedules to make consistency effortless.
+                             </p>
+
+                             <form id="stack-builder-form" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; background-color: var(--bg-primary); padding: 16px; border-radius: var(--border-radius-md); border: 1px solid var(--border-color);">
+                                 <div style="flex: 1; min-width: 200px;">
+                                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Select Habit to Stack</label>
+                                     <select id="stack-habit-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--border-radius-sm); font-size: 13px;" required>
+                                         <!-- Populated dynamically -->
+                                     </select>
+                                 </div>
+                                 <div style="flex: 1; min-width: 200px;">
+                                     <label style="display: block; font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px;">Link to Daily Anchor</label>
+                                     <select id="stack-anchor-select" style="width: 100%; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 10px; border-radius: var(--border-radius-sm); font-size: 13px;" required>
+                                         <option value="fajr">After Fajr (Dawn Prayer)</option>
+                                         <option value="school">Before 7:30 AM School Start</option>
+                                         <option value="dhuhr">After Dhuhr (Midday Prayer)</option>
+                                         <option value="asr">After Asr (Afternoon Prayer)</option>
+                                         <option value="maghrib">After Maghrib (Sunset Prayer)</option>
+                                         <option value="isha">After Isha (Night Prayer)</option>
+                                     </select>
+                                 </div>
+                                 <button type="submit" class="primary-button" style="height: 42px; font-weight: 700; white-space: nowrap;">
+                                     <span class="material-symbols-outlined">link</span> Stack Habit
+                                 </button>
+                             </form>
+
+                             <div style="margin-top: 16px;">
+                                 <h4 style="font-size: 13px; font-weight: 700; margin-bottom: 12px; color: var(--text-primary);">Active Stacking Links</h4>
+                                 <div id="stack-links-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                     <!-- Filled dynamically -->
+                                 </div>
+                             </div>
+                         </div>
+
+                         <!-- Family-First Weekend & Chore Scheduler Card -->
+                         <div class="widget-card" style="margin-top: 16px;">
+                             <div class="widget-header-row" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 1px solid var(--border-color); padding-bottom: 10px;">
+                                 <h3 style="font-size: 15px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; margin: 0;">
+                                     <span class="material-symbols-outlined" style="color: var(--warning-color);">home</span> 🏡 Family Chores & Weekend Planner
+                                 </h3>
+                                 <button class="text-btn" id="btn-add-custom-chore" style="font-size: 11px; padding: 4px 8px; border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); background: var(--bg-primary); font-weight: 600; cursor: pointer;">+ Custom Chore</button>
+                             </div>
+                             <p style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px; line-height: 1.4;">
+                                 Automatically slots household chores and study blocks around prayers, Saturday Arabic class, and high-priority family obligations.
+                             </p>
+                             
+                             <!-- Chores List Container -->
+                             <div style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 16px;">
+                                 <h4 style="font-size: 12px; font-weight: 700; color: var(--accent-color); margin-bottom: 10px; display: flex; align-items: center; gap: 4px;">
+                                     <span class="material-symbols-outlined" style="font-size: 16px;">checklist</span> Household Chores List
+                                 </h4>
+                                 <div id="family-chores-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                     <!-- Populated dynamically -->
+                                 </div>
+                             </div>
+
+                             <!-- Auto-Optimize Action Box -->
+                             <div style="background: var(--bg-primary); border: 1px dashed var(--accent-color); padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 16px;">
+                                 <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px;">
+                                     <div>
+                                         <h5 style="font-size: 12px; font-weight: 700; color: var(--text-primary); margin-bottom: 2px;">Family-First Smart Scheduler</h5>
+                                         <p style="font-size: 11px; color: var(--text-secondary);">Optimize your weekend plan to integrate study sessions, family helper blocks, and due chores.</p>
+                                     </div>
+                                     <button class="primary-button" id="btn-optimize-schedule" style="height: 36px; padding: 0 12px; font-size: 12px; font-weight: 700; white-space: nowrap; cursor: pointer;">
+                                         <span class="material-symbols-outlined" style="font-size: 16px;">insights</span> Auto-Schedule
+                                     </button>
+                                 </div>
+                             </div>
+
+                             <!-- Generated Schedule Container (hidden until optimization clicked) -->
+                             <div id="optimized-schedule-output" style="display: none; background: var(--bg-secondary); border: 1px solid var(--border-color); padding: 12px; border-radius: var(--border-radius-md);">
+                                 <h4 style="font-size: 12px; font-weight: 700; color: var(--warning-color); margin-bottom: 10px; display: flex; align-items: center; gap: 4px;">
+                                     <span class="material-symbols-outlined" style="font-size: 16px;">calendar_today</span> Optimized Weekend Schedule
+                                 </h4>
+                                 <div id="weekend-schedule-timeline" style="display: flex; flex-direction: column; gap: 10px; border-left: 2px solid var(--border-color); padding-left: 12px; margin-left: 6px;">
+                                     <!-- Filled dynamically -->
+                                 </div>
+                             </div>
+                         </div>
+                         
+                     </div>
+                 </section>
+
+                 <!-- 5. MOOD & JOURNAL SCREEN -->
+                <section id="tab-journal" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Reflections & Mood Journal</h2>
+                            <p>Discover correlations between daily habits, mood, and mental health patterns.</p>
+                        </div>
+                    </div>
+
+                    <div class="journal-layout-grid">
+                        <!-- Left Side: Daily Mood & Weekly Reflection -->
+                        <div style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Triple Daily Mood Checks -->
+                            <div class="card" style="margin-bottom: 0px;">
+                                <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <span class="material-symbols-outlined" style="color: var(--primary-color);">sentiment_satisfied</span>
+                                    Triple Mood Check-In
+                                </h3>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                                    Track your daily mental fluctuations at 3 key milestones: Morning, Afternoon, and Night.
+                                </p>
+                                <div id="journal-mood-container">
+                                    <!-- Rendered dynamically by renderTripleMoodChecks -->
+                                </div>
+                            </div>
+
+                            <!-- Weekly Reflection Card -->
+                            <div class="card journal-entry-card" style="margin-top: 0px;">
+                                <h3 style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                                    <span class="material-symbols-outlined" style="color: var(--primary-color);">rate_review</span>
+                                    Weekly Reflection Journal
+                                </h3>
+                                <p style="font-size: 11px; color: var(--text-secondary); margin-bottom: 12px; line-height: 1.4;">
+                                    Instead of a daily burden, consolidate your lessons, wins, and next-week course corrections once a week.
+                                </p>
+                                <form id="journal-form" class="journal-form">
+                                    <div class="form-group" style="margin-bottom: 12px;">
+                                        <label for="entry-week-selector" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Select Week Ending</label>
+                                        <select id="entry-week-selector" class="form-control" style="width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-weight: 600; font-size: 12px; outline: none; transition: border-color var(--transition-speed);"></select>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 12px;">
+                                        <label for="entry-reflection" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Wins, Failures, & Next Week Corrections</label>
+                                        <textarea id="entry-reflection" rows="5" required placeholder="What course chapters did you master? What distractions derailed you, and how will your strictness level prevent this next week? Describe fully..." style="width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 12px; line-height: 1.4; resize: none;"></textarea>
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 12px;">
+                                        <label for="entry-grateful" style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 4px; display: block;">Three Things You're Grateful For</label>
+                                        <input type="text" id="entry-grateful" required placeholder="1. ...  2. ...  3. ..." style="width: 100%; padding: 10px; background: var(--bg-primary); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm); color: var(--text-primary); font-size: 12px;">
+                                    </div>
+
+                                    <div class="form-group" style="margin-bottom: 16px;">
+                                        <label style="font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; display: block;">Associate Habits focused on this week:</label>
+                                        <div id="journal-habit-checkpoints" class="habit-checkpoints-grid">
+                                             <!-- Checkboxes of active habits -->
+                                        </div>
+                                    </div>
+
+                                    <button type="submit" class="primary-button w-full justify-center" style="font-weight: 700; font-size: 12px; padding: 10px;">Save Weekly Reflection</button>
+                                </form>
+                            </div>
+                        </div>
+
+                        <!-- Right Side: Mood Analytics & History -->
+                        <div class="journal-analytics">
+                            <div class="card stats-card">
+                                <h3>Mood & Mind Analytics</h3>
+                                <div class="mood-trend-gauge">
+                                    <div class="gauge-average-emoji" id="avg-mood-emoji">😐</div>
+                                    <div class="gauge-average-text">
+                                        <span class="gauge-label">Average 30-Day Mood</span>
+                                        <h4 id="avg-mood-title">Okay Consistency</h4>
+                                    </div>
+                                </div>
+                                
+                                <div class="mood-correlation-card">
+                                    <h4>Mood-Habit Correlations</h4>
+                                    <p class="description">How habits impact your overall daily mental state:</p>
+                                    <div id="mood-correlation-results" class="correlation-list">
+                                        <!-- Populated dynamically -->
+                                        <div class="empty-state-sm">Log habits and mood for 3 days to see correlations!</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Historic Entries -->
+                            <div class="card journal-history-card">
+                                <h3>Past Weekly Reflections</h3>
+                                <div id="journal-entries-list" class="journal-history-list">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 6. AI HABIT COACH SCREEN -->
+                <section id="tab-ai-coach" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>AI Life Assistant & Habit Coach</h2>
+                            <p>Leverage secure server-side Gemini intelligence to coordinate your habits, studies, goals, and provide general life assistance.</p>
+                        </div>
+                    </div>
+
+                    <div class="ai-coach-layout">
+                        <!-- AI Options: Conversational Coach vs Weekly Review -->
+                        <div class="ai-tabs">
+                            <button class="ai-tab-btn active" data-ai-section="chat">AI Life Assistant Chat</button>
+                            <button class="ai-tab-btn" data-ai-section="weekly-review">AI Weekly Performance Review</button>
+                        </div>
+
+                        <!-- Section A: Conversational Coach -->
+                        <div id="ai-section-chat" class="ai-content-panel active">
+                            <div class="chat-interface">
+                                <div class="chat-intro">
+                                    <div class="coach-avatar">🤖</div>
+                                    <div class="coach-intro-text">
+                                        <h3>Meet Oumar's AI Life Assistant</h3>
+                                        <p>I am your full-time life assistant and coach. Ask me for help with your schoolwork, daily routines, productivity habits, or any general life and philosophical questions!</p>
+                                    </div>
+                                </div>
+
+                                <div class="chat-messages-container" id="chat-messages">
+                                    <div class="message system-msg">
+                                        <div class="message-sender">Oumar AI Life Assistant</div>
+                                        <div class="message-text">Hello Oumar! I am your AI Life Assistant and Habit Coach. Feel free to ask me about your study materials, daily routines, academic challenges, or how to organize your schedule for school and life. I'm ready to assist you!</div>
+                                    </div>
+                                </div>
+
+                                <div class="chat-input-area">
+                                    <input type="text" id="chat-input" placeholder="Type a message or ask 'Analyze my current weaknesses'...">
+                                    <button id="chat-send-btn" class="primary-button icon-only">
+                                        <span class="material-symbols-outlined">send</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Section B: Weekly Performance Review -->
+                        <div id="ai-section-weekly-review" class="ai-content-panel">
+                            <div class="card review-card">
+                                <div class="review-header">
+                                    <span class="material-symbols-outlined review-icon">military_tech</span>
+                                    <div>
+                                        <h3>AI Weekly Review & Synthesis</h3>
+                                        <p>Computes overall success rates, consistency scores, strongest/weakest habit analysis, and issues actionable recommendations.</p>
+                                    </div>
+                                </div>
+
+                                <div class="review-generate-btn-container">
+                                    <button id="generate-review-btn" class="primary-button justify-center">
+                                        <span class="material-symbols-outlined">analytics</span> Generate Weekly Review & Advice
+                                    </button>
+                                </div>
+
+                                <div id="review-output-container" class="review-output empty">
+                                    <div class="empty-state">
+                                        <span class="material-symbols-outlined">summarize</span>
+                                        <p>No review generated yet. Click the button above to synthesize your weekly metrics and get AI feedback.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 7. CHALLENGES & ACHIEVEMENTS SCREEN -->
+                <section id="tab-challenges" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Challenges & Badges</h2>
+                            <p>Challenge yourself with consistency sprints and unlock unique milestones.</p>
+                        </div>
+                    </div>
+
+                    <!-- Challenges Cards -->
+                    <h3 class="section-title">Active Challenges</h3>
+                    <div class="challenges-grid" id="challenges-container">
+                        <!-- Populated dynamically -->
+                    </div>
+
+                    <!-- Achievements Section -->
+                    <h3 class="section-title margin-top-lg">Achievement Badges</h3>
+                    <div class="badges-grid" id="badges-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+
+                <!-- 8. SETTINGS SCREEN -->
+                <section id="tab-settings" class="tab-panel">
+                    <div class="screen-header">
+                        <div>
+                            <h2>Settings & Sync</h2>
+                            <p>Personalize your experience, manage notifications, and perform data operations.</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid">
+                        <!-- Personalization -->
+                        <div class="card">
+                            <h3>Personalization</h3>
+                            <form id="settings-personalization-form" class="settings-form">
+                                <div class="form-group">
+                                    <label for="settings-username">Your Name</label>
+                                    <input type="text" id="settings-username" value="Oumar">
+                                </div>
+                                <div class="form-group">
+                                    <label for="settings-quote">Daily Motivation Accent</label>
+                                    <select id="settings-motivation-style">
+                                        <option value="minimalist">Minimalist Zen</option>
+                                        <option value="academic">Academic / Scholarly</option>
+                                        <option value="beastmode">Beast Mode Motivation</option>
+                                        <option value="stoic">Stoic Philosophy</option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="secondary-button">Save Profile</button>
+                            </form>
+                        </div>
+
+                        <!-- System & Alerts -->
+                        <div class="card">
+                            <h3>System & Reminders</h3>
+                            <div class="setting-toggle-row">
+                                <div>
+                                    <h4>Browser Notifications</h4>
+                                    <p class="description">Send reminders for habits and focus timer ends.</p>
+                                </div>
+                                <button id="btn-request-notification" class="secondary-button text-sm">Enable</button>
+                            </div>
+                            <hr class="settings-divider">
+                            <div class="setting-toggle-row">
+                                <div>
+                                    <h4>Sound Effects</h4>
+                                    <p class="description">Play alert chime when a Pomodoro session finishes.</p>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="setting-sound-effects" checked>
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Data Backup & Reset -->
+                        <div class="card col-span-2">
+                            <h3>Security, Backup & Portability</h3>
+                            <p class="description">Your data is stored completely locally in your browser's Local Storage. We never send your notes, planner items, or reflection journal to external servers (except to the secure Gemini API when requesting coaching assistance).</p>
+                            
+                            <div class="backup-actions">
+                                <div class="backup-col">
+                                    <h4>Export All Data</h4>
+                                    <p class="description text-sm">Download your complete Oumar Habits dataset (habits, journal, logs, tasks, etc.) as a JSON file.</p>
+                                    <button id="btn-export-data" class="secondary-button">
+                                        <span class="material-symbols-outlined">download</span> Export JSON
+                                    </button>
+                                </div>
+                                
+                                <div class="backup-col">
+                                    <h4>Import Data</h4>
+                                    <p class="description text-sm">Restore your habits database from a previously exported JSON backup file.</p>
+                                    <div class="import-file-selector">
+                                        <input type="file" id="input-import-file" accept=".json" style="display: none;">
+                                        <button id="btn-trigger-import" class="secondary-button">
+                                            <span class="material-symbols-outlined">upload</span> Select Backup File
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <hr class="settings-divider">
+
+                            <div class="danger-zone">
+                                <div>
+                                    <h4>Factory Reset App</h4>
+                                    <p class="description text-red text-sm">This completely deletes all your custom habits, Pomodoro history, school task planners, reflection logs, and returns the app to the initial default template. This cannot be undone!</p>
+                                </div>
+                                <button id="btn-factory-reset" class="danger-button">
+                                    <span class="material-symbols-outlined">delete_forever</span> Factory Reset
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+        </div>
+
+        <!-- Navigation Bar (Mobile bottom nav) -->
+        <nav class="app-bottom-nav">
+            <button class="nav-item active" data-tab="dashboard">
+                <span class="material-symbols-outlined">dashboard</span>
+                <span>Home</span>
+            </button>
+            <button class="nav-item" data-tab="habits">
+                <span class="material-symbols-outlined">pageview</span>
+                <span>Habits</span>
+            </button>
+            <button class="nav-item" data-tab="pomodoro">
+                <span class="material-symbols-outlined">timer</span>
+                <span>Focus</span>
+            </button>
+            <button class="nav-item" data-tab="school">
+                <span class="material-symbols-outlined">school</span>
+                <span>School</span>
+            </button>
+            <button class="nav-item" data-tab="prayers">
+                <span class="material-symbols-outlined">mosque</span>
+                <span>Prayers</span>
+            </button>
+            <button class="nav-item" data-tab="journal">
+                <span class="material-symbols-outlined">edit_note</span>
+                <span>Mind</span>
+            </button>
+            <button class="nav-item" data-tab="ai-coach">
+                <span class="material-symbols-outlined">smart_toy</span>
+                <span>AI Coach</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- ================= MODALS ================= -->
+
+    <!-- A. ADD/EDIT HABIT MODAL -->
+    <div id="habit-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="habit-modal-title">Create New Habit</h3>
+                <button class="icon-button modal-close" data-modal="habit-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="habit-form" class="modal-body">
+                <input type="hidden" id="habit-edit-id" value="">
+                
+                <div class="form-group">
+                    <label for="habit-name">Habit Name *</label>
+                    <input type="text" id="habit-name" required placeholder="e.g. Read 15 Pages, Code, Drink Water...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="habit-category">Category</label>
+                        <select id="habit-category">
+                            <option value="Health">💪 Health</option>
+                            <option value="Mind">🧘 Mind & Spirit</option>
+                            <option value="Academics">📚 Academics</option>
+                            <option value="Finance">💰 Finance</option>
+                            <option value="Social">🤝 Social</option>
+                            <option value="Custom">✏️ Custom...</option>
+                        </select>
+                        <input type="text" id="habit-custom-category" placeholder="Type Category Name..." style="display: none; margin-top: 8px;">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habit-routine">Routine Type</label>
+                        <select id="habit-routine">
+                            <option value="none">Anytime</option>
+                            <option value="morning">🌅 Morning Routine</option>
+                            <option value="evening">🌌 Evening Routine</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="habit-type">Habit Type</label>
+                        <select id="habit-type">
+                            <option value="yes_no">Yes / No (Checkbox)</option>
+                            <option value="count">Count (e.g. 8 Glasses)</option>
+                            <option value="duration">Duration (e.g. 30 Minutes)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="habit-target-container" style="display: none;">
+                        <label id="habit-target-label" for="habit-target">Daily Target</label>
+                        <input type="number" id="habit-target" value="1" min="1">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="habit-schedule">Schedule Repeat</label>
+                        <select id="habit-schedule">
+                            <option value="daily">Everyday</option>
+                            <option value="weekdays">Weekdays (M-F)</option>
+                            <option value="weekends">Weekends (S-S)</option>
+                            <option value="custom">Specific Days...</option>
+                        </select>
+                        <div id="habit-custom-days" class="days-checklist" style="display: none;">
+                            <label><input type="checkbox" value="0"> S</label>
+                            <label><input type="checkbox" value="1"> M</label>
+                            <label><input type="checkbox" value="2"> T</label>
+                            <label><input type="checkbox" value="3"> W</label>
+                            <label><input type="checkbox" value="4"> T</label>
+                            <label><input type="checkbox" value="5"> F</label>
+                            <label><input type="checkbox" value="6"> S</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habit-color">Color Accent</label>
+                        <div class="color-palette-selector">
+                            <input type="hidden" id="habit-color" value="#0066FF">
+                            <button type="button" class="color-dot active" style="background-color: #0066FF;" data-color="#0066FF"></button>
+                            <button type="button" class="color-dot" style="background-color: #00CC88;" data-color="#00CC88"></button>
+                            <button type="button" class="color-dot" style="background-color: #FF5E5E;" data-color="#FF5E5E"></button>
+                            <button type="button" class="color-dot" style="background-color: #FFAA00;" data-color="#FFAA00"></button>
+                            <button type="button" class="color-dot" style="background-color: #9933FF;" data-color="#9933FF"></button>
+                            <button type="button" class="color-dot" style="background-color: #FF66CC;" data-color="#FF66CC"></button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="habit-notes">Description / Personal Instructions</label>
+                    <textarea id="habit-notes" rows="2" placeholder="e.g. Leave book on pillow. Start with deep breaths..."></textarea>
+                </div>
+
+                <!-- James Clear's Atomic Habits Formulation -->
+                <div style="margin-top: 16px; border-top: 1px dashed var(--border-color); padding-top: 16px;">
+                    <h4 style="font-size: 13px; font-weight: 700; color: var(--accent-color); margin-bottom: 12px; display: flex; align-items: center; gap: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">auto_stories</span> Atomic Habits Toolkit
+                    </h4>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="habit-impl-time">Implementation Time</label>
+                            <input type="text" id="habit-impl-time" placeholder="e.g., at 4:00 PM, after Fajr...">
+                        </div>
+                        <div class="form-group">
+                            <label for="habit-impl-loc">Implementation Location</label>
+                            <input type="text" id="habit-impl-loc" placeholder="e.g., at my study desk, in my room...">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="habit-2min-version">2-Minute Rule Version (Starting step for low-energy days)</label>
+                            <input type="text" id="habit-2min-version" placeholder="e.g., Read 1 page, open my notebook...">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="habit-temptation">Temptation Bundling Reward (Paired attractive activity)</label>
+                            <input type="text" id="habit-temptation" placeholder="e.g., enjoy a coffee, check phone for 5m, listen to my music...">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="danger-button" id="habit-delete-btn" style="display: none; margin-right: auto;">Delete Habit</button>
+                    <button type="button" class="secondary-button modal-close" data-modal="habit-modal">Cancel</button>
+                    <button type="submit" class="primary-button">Save Habit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- B. ADD/EDIT SCHOOL TASK MODAL -->
+    <div id="school-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="school-modal-title">Add School Task</h3>
+                <button class="icon-button modal-close" data-modal="school-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="school-form" class="modal-body">
+                <input type="hidden" id="school-edit-id" value="">
+
+                <div class="form-group">
+                    <label for="school-title">Task Title *</label>
+                    <input type="text" id="school-title" required placeholder="e.g. Physics Lab Report, Calculus Quiz...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="school-type">Task Type</label>
+                        <select id="school-type">
+                            <option value="homework">📝 Homework</option>
+                            <option value="quiz">⚡ Quiz</option>
+                            <option value="project">📁 Project</option>
+                            <option value="exam">🎓 Exam</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="school-due">Due Date</label>
+                        <input type="date" id="school-due" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="school-subject">Subject</label>
+                        <input type="text" id="school-subject" placeholder="e.g. MATH101, PHYS202...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="school-notes">Additional Details / Milestones</label>
+                    <textarea id="school-notes" rows="3" placeholder="Requirements: minimum 3 references, APA style format..."></textarea>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="danger-button" id="school-delete-btn" style="display: none; margin-right: auto;">Delete Task</button>
+                    <button type="button" class="secondary-button modal-close" data-modal="school-modal">Cancel</button>
+                    <button type="submit" class="primary-button">Save Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- C. DATA ANALYTICS & BREAKDOWN DETAIL MODAL -->
+    <div id="analytics-modal" class="modal-overlay">
+        <div class="modal-box max-w-xl">
+            <div class="modal-header">
+                <h3>Productivity Score Analysis</h3>
+                <button class="icon-button modal-close" data-modal="analytics-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="score-breakdown-details text-center">
+                    <h2 class="display-score" id="detail-score-display">85</h2>
+                    <p class="score-quality text-accent" id="detail-score-quality">Excellent Productivity</p>
+                    <p class="description">Your Productivity Score is a dynamic indicator computed based on your consistency across three core domains of life.</p>
+                </div>
+
+                <hr class="divider">
+
+                <div class="formulas-container">
+                    <h4 class="sub-header">How it is calculated:</h4>
+                    <div class="formula-box">
+                        <div class="formula-title">
+                            <span class="material-symbols-outlined text-primary">analytics</span>
+                            <h5>1. Habits Compliance (50% weight)</h5>
+                        </div>
+                        <p class="formula-desc">Your daily task success rate over the last 7 days. Completing morning and evening routines awards maximum consistency multipliers!</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <div class="formula-title">
+                            <span class="material-symbols-outlined text-accent">timer</span>
+                            <h5>2. Deep Focus Engine (25% weight)</h5>
+                        </div>
+                        <p class="formula-desc">Deep work minutes tracked in the Focus Timer. Completing 2 standard 25-minute Pomodoro sessions daily yields a 100% score for this domain!</p>
+                    </div>
+
+                    <div class="formula-box">
+                        <div class="formula-title">
+                            <span class="material-symbols-outlined text-green">school</span>
+                            <h5>3. Academic Planning (25% weight)</h5>
+                        </div>
+                        <p class="formula-desc">The completion speed of items inside your school planner. Keeping homework, exams, and quizzes updated prevents cramming and raises this index!</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- D. ADD CUSTOM CHORE MODAL -->
+    <div id="chore-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>Add Custom Household Chore</h3>
+                <button class="icon-button modal-close" data-modal="chore-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="chore-form" class="modal-body">
+                <div class="form-group">
+                    <label for="chore-title">Chore Title *</label>
+                    <input type="text" id="chore-title" required placeholder="e.g. Wash dishes, clean vacuum filter...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="chore-frequency">Frequency</label>
+                        <select id="chore-frequency">
+                            <option value="3">Every 3 Days</option>
+                            <option value="7">Weekly (7 Days)</option>
+                            <option value="14">Bi-Weekly (14 Days)</option>
+                            <option value="30">Monthly (30 Days)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="chore-priority">Priority</label>
+                        <select id="chore-priority">
+                            <option value="high">🔴 High Priority (Immediate)</option>
+                            <option value="medium">🟡 Medium Priority (Flexible)</option>
+                            <option value="low">🟢 Low Priority (Anytime)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="secondary-button modal-close" data-modal="chore-modal">Cancel</button>
+                    <button type="submit" class="primary-button">Save Chore</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- E. SCHOOL PLANNER OBJECTIVE VERIFICATION MODAL -->
+    <div id="school-verify-modal" class="modal-overlay">
+        <div class="modal-box max-w-xl">
+            <div class="modal-header">
+                <h3>🔒 Verify Academic Objective Complete</h3>
+                <button class="icon-button modal-close" data-modal="school-verify-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="school-verify-form" class="modal-body">
+                <input type="hidden" id="school-verify-task-id" value="">
+                
+                <div class="verification-instructions" style="background: var(--bg-primary); border: 1px dashed var(--warning-color); padding: 12px; border-radius: var(--border-radius-md); margin-bottom: 16px;">
+                    <h5 id="school-verify-task-title" style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px;">Task Name</h5>
+                    <p style="font-size: 11px; color: var(--text-secondary);">
+                        To unlock completion and verify homework academic progress, submit a reflective log or upload photo proof (study notes, notebook pages). 
+                    </p>
+                </div>
+
+                <div class="form-group">
+                    <label for="school-verify-reflection">Written Study Reflection / Notes (What did you achieve?)</label>
+                    <textarea id="school-verify-reflection" rows="3" required placeholder="Describe key concepts studied, formulas reviewed, or summary of completed pages..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                        <span class="material-symbols-outlined" style="font-size: 18px; color: var(--primary-color);">add_a_photo</span> 
+                        Upload Photo Proof (Notes or Document) - optional
+                    </label>
+                    <input type="file" id="school-verify-file" accept="image/*" style="display: none;">
+                    <div id="school-verify-file-trigger" style="border: 2px dashed var(--border-color); padding: 16px; text-align: center; border-radius: var(--border-radius-md); cursor: pointer; transition: all 0.2s; margin-top: 6px;">
+                        <span class="material-symbols-outlined" style="font-size: 32px; color: var(--text-secondary); margin-bottom: 4px;">cloud_upload</span>
+                        <p style="font-size: 12px; color: var(--text-secondary); font-weight: 600;" id="school-verify-file-lbl">Select or snap photo proof</p>
+                    </div>
+                </div>
+
+                <!-- Live Image Preview (hidden until selected) -->
+                <div id="school-verify-preview-container" style="display: none; margin-bottom: 16px; text-align: center;">
+                    <img id="school-verify-img-preview" src="" style="max-height: 150px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); box-shadow: var(--card-shadow);">
+                </div>
+
+                <div class="modal-actions" style="margin-top: 20px;">
+                    <button type="button" class="secondary-button modal-close" data-modal="school-verify-modal">Cancel</button>
+                    <button type="submit" class="primary-button" id="btn-submit-verify">Submit Verification</button>
+                </div>
+            </form>
+            
+            <!-- Dynamic Verification Progress Indicator -->
+            <div id="school-verify-loading" style="display: none; text-align: center; padding: 24px;">
+                <div class="spinner" style="border: 4px solid var(--border-color); border-top: 4px solid var(--accent-color); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 12px;"></div>
+                <h4 style="font-weight: 700; color: var(--text-primary); font-size: 14px; margin-bottom: 4px;">Oumar AI Life Assistant</h4>
+                <p style="font-size: 11px; color: var(--text-secondary);" id="verify-loading-text">Analyzing reflection log and verifying notes...</p>
+            </div>
+
+            <!-- Verification Success Result Container -->
+            <div id="school-verify-success" style="display: none; padding: 16px; background: rgba(16, 185, 129, 0.1); border: 1px solid var(--accent-color); border-radius: var(--border-radius-md); text-align: center; margin: 12px;">
+                <span class="material-symbols-outlined" style="font-size: 48px; color: var(--accent-color); margin-bottom: 8px;">verified</span>
+                <h4 style="font-size: 15px; font-weight: 700; color: var(--text-primary); margin-bottom: 6px;">Objective Verification Successful!</h4>
+                <div id="school-verify-ai-feedback" style="font-size: 12px; color: var(--text-secondary); text-align: left; background: var(--bg-secondary); padding: 10px; border-radius: var(--border-radius-sm); border: 1px solid var(--border-color); line-height: 1.5; margin-bottom: 12px; min-height: 60px;">
+                    AI feedback populated here...
+                </div>
+                <button type="button" class="primary-button" id="btn-verify-success-close" style="width: 100%;">Cleared! +50 XP</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PWA Service Worker script registration & Main App Loader -->
+    <script src="app.js"></script>
+    <script>
+        // Register PWA Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered successfully!', reg.scope))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
