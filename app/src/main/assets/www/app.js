@@ -907,13 +907,30 @@ function renderDashboard() {
         return isHabitScheduledForDay(h, dayOfWeek);
     });
 
-    if (filteredTodayHabits.length === 0) {
+    if (state.habits.length === 0) {
         listContainer.innerHTML = `
-            <div class="empty-state">
-                <span class="material-symbols-outlined">done_all</span>
-                <p>All routines clean! No pending scheduled habits for this category today.</p>
+            <div class="empty-state" style="padding: 24px 16px; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 38px; color: var(--primary-color);">add_task</span>
+                <h4 style="font-size: 13px; font-weight: 700; color: var(--text-primary); margin-top: 4px;">No Habits Created Yet</h4>
+                <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">Build your ideal routines! Create your first daily habit in the Studio Hub.</p>
+                <button class="btn btn-primary btn-sm btn-go-tab" data-target="habits" style="margin-top: 10px; padding: 6px 14px; border-radius: 18px; cursor: pointer;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">add</span> Create First Habit
+                </button>
             </div>
         `;
+        document.getElementById('today-completion-badge').textContent = `0 habits`;
+    } else if (filteredTodayHabits.length === 0) {
+        listContainer.innerHTML = `
+            <div class="empty-state" style="padding: 20px 16px; text-align: center;">
+                <span class="material-symbols-outlined" style="font-size: 32px; color: var(--accent-color);">event_available</span>
+                <p style="font-size: 12px; font-weight: 600; color: var(--text-primary); margin-top: 4px;">No Pending Scheduled Habits (${activeFilter.toUpperCase()})</p>
+                <p style="font-size: 11px; color: var(--text-secondary); margin-top: 2px;">All routines clean or none scheduled for this filter today.</p>
+                <button class="btn-go-tab" data-target="habits" style="margin-top: 8px; background: none; border: none; color: var(--primary-color); font-size: 11px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 14px;">calendar_month</span> Manage Habit Schedules &rarr;
+                </button>
+            </div>
+        `;
+        document.getElementById('today-completion-badge').textContent = `0/${state.habits.length} today`;
     } else {
         let completedCount = 0;
         filteredTodayHabits.forEach(h => {
@@ -2297,33 +2314,523 @@ window.onGeminiResponseCallback = function(rawResponse) {
     renderAIScreen();
 };
 
+function appendReviewToChats(reviewHtml) {
+    const chatContainer = document.getElementById('chat-messages');
+    if (chatContainer) {
+        const coachMsg = document.createElement('div');
+        coachMsg.className = 'message system-msg';
+        coachMsg.innerHTML = `
+            <div class="message-sender">Oumar AI Life Assistant</div>
+            <div class="message-text" style="font-size: 12px; line-height: 1.4; color: var(--text-primary);">
+                <div style="font-size: 11px; font-weight: bold; color: var(--primary-color); margin-bottom: 8px; display: flex; align-items: center; gap: 4px; border-bottom: 1px solid var(--border-color); padding-bottom: 6px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">analytics</span>
+                    WEEKLY REVIEW GENERATED
+                </div>
+                ${reviewHtml}
+            </div>
+        `;
+        chatContainer.appendChild(coachMsg);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+}
+
+function getSkeletonHtmlForTab(tabId) {
+    if (tabId === 'dashboard') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-card skeleton-shimmer" style="height: 110px; border:none; border-radius:var(--border-radius-lg); opacity: 0.85;"></div>
+                
+                <div class="skeleton-grid-2">
+                    <div class="skeleton-card">
+                        <div class="skeleton-header-block">
+                            <div class="skeleton-title skeleton-shimmer"></div>
+                            <div class="skeleton-shimmer" style="width: 80px; height: 16px;"></div>
+                        </div>
+                        <div class="skeleton-row" style="margin-top: 8px;">
+                            <div class="skeleton-shimmer" style="width: 50px; height: 24px; border-radius: 12px;"></div>
+                            <div class="skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 12px;"></div>
+                            <div class="skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 12px;"></div>
+                        </div>
+                        <div class="skeleton-row" style="margin-top: 12px;">
+                            <div class="skeleton-circle skeleton-shimmer" style="width: 24px; height: 24px;"></div>
+                            <div class="skeleton-line skeleton-shimmer"></div>
+                        </div>
+                        <div class="skeleton-row">
+                            <div class="skeleton-circle skeleton-shimmer" style="width: 24px; height: 24px;"></div>
+                            <div class="skeleton-line skeleton-shimmer short"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="skeleton-card" style="align-items: center; justify-content: center; gap: 16px;">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 50%;"></div>
+                        <div class="skeleton-shimmer" style="width: 120px; height: 120px; border-radius: 50%;"></div>
+                        <div class="skeleton-subtitle skeleton-shimmer" style="width: 70%;"></div>
+                    </div>
+                </div>
+
+                <div class="skeleton-card">
+                    <div class="skeleton-title skeleton-shimmer"></div>
+                    <div class="skeleton-line skeleton-shimmer"></div>
+                    <div class="skeleton-row">
+                        <div class="skeleton-shimmer" style="width: 40px; height: 40px; border-radius: 8px;"></div>
+                        <div class="skeleton-line skeleton-shimmer short"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (tabId === 'habits') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-header-block" style="margin-bottom: 8px;">
+                    <div class="skeleton-title skeleton-shimmer" style="height: 24px; width: 30%;"></div>
+                    <div class="skeleton-shimmer" style="width: 140px; height: 38px; border-radius: var(--border-radius-sm);"></div>
+                </div>
+                
+                <div class="skeleton-card">
+                    <div class="skeleton-row">
+                        <div class="skeleton-circle skeleton-shimmer"></div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                            <div class="skeleton-line skeleton-shimmer" style="width: 40%;"></div>
+                            <div class="skeleton-line skeleton-shimmer short"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="skeleton-card">
+                    <div class="skeleton-row">
+                        <div class="skeleton-circle skeleton-shimmer"></div>
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 8px;">
+                            <div class="skeleton-line skeleton-shimmer" style="width: 55%;"></div>
+                            <div class="skeleton-line skeleton-shimmer short"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="skeleton-card">
+                    <div class="skeleton-title skeleton-shimmer"></div>
+                    <div class="skeleton-line skeleton-shimmer"></div>
+                    <div class="skeleton-button skeleton-shimmer" style="margin-top: 8px;"></div>
+                </div>
+            </div>
+        `;
+    }
+    
+    if (tabId === 'pomodoro') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-card" style="display:flex; flex-direction:column; align-items:center; gap:16px; padding:24px;">
+                    <div class="skeleton-title skeleton-shimmer" style="width: 40%;"></div>
+                    <div class="skeleton-circle skeleton-shimmer" style="width: 160px; height: 160px; border-radius: 50%;"></div>
+                    <div class="skeleton-row" style="justify-content:center; gap:12px;">
+                        <div class="skeleton-shimmer" style="width: 100px; height: 40px; border-radius: 20px;"></div>
+                        <div class="skeleton-shimmer" style="width: 100px; height: 40px; border-radius: 20px;"></div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-title skeleton-shimmer" style="width: 30%;"></div>
+                    <div class="skeleton-line skeleton-shimmer"></div>
+                    <div class="skeleton-line skeleton-shimmer short"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tabId === 'school') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-grid-2">
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer"></div>
+                        <div class="skeleton-line skeleton-shimmer" style="height: 100px; margin-top: 10px;"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer"></div>
+                        <div class="skeleton-row" style="margin-top: 12px;">
+                            <div class="skeleton-shimmer" style="width: 40px; height: 40px; border-radius: 8px;"></div>
+                            <div class="skeleton-line skeleton-shimmer"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="skeleton-card">
+                    <div class="skeleton-title skeleton-shimmer" style="width: 40%;"></div>
+                    <div class="skeleton-line skeleton-shimmer" style="height: 120px;"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tabId === 'prayers') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-card skeleton-shimmer" style="height: 90px; border-radius:12px;"></div>
+                <div class="skeleton-card">
+                    <div class="skeleton-title skeleton-shimmer" style="width: 50%;"></div>
+                    <div class="skeleton-row" style="margin-top:12px;">
+                        <div class="skeleton-shimmer" style="width: 20%; height: 30px; border-radius:6px;"></div>
+                        <div class="skeleton-shimmer" style="width: 20%; height: 30px; border-radius:6px;"></div>
+                        <div class="skeleton-shimmer" style="width: 20%; height: 30px; border-radius:6px;"></div>
+                        <div class="skeleton-shimmer" style="width: 20%; height: 30px; border-radius:6px;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tabId === 'journal') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-grid-2">
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 50%;"></div>
+                        <div class="skeleton-shimmer" style="height: 60px; border-radius: 8px; margin-top: 8px;"></div>
+                        <div class="skeleton-shimmer" style="height: 60px; border-radius: 8px; margin-top: 8px;"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 60%;"></div>
+                        <div class="skeleton-shimmer" style="width: 100%; height: 100px; border-radius: 4px; margin-top: 8px;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tabId === 'ai-coach') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-card">
+                    <div class="skeleton-header-block">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 50%;"></div>
+                        <div class="skeleton-shimmer" style="width: 80px; height: 24px; border-radius: 12px;"></div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-top: 16px;">
+                        <div style="align-self: flex-start; width: 75%; background: var(--bg-tertiary); padding: 12px; border-radius: 8px;">
+                            <div class="skeleton-line skeleton-shimmer"></div>
+                        </div>
+                        <div style="align-self: flex-end; width: 60%; background: var(--primary-light); padding: 12px; border-radius: 8px;">
+                            <div class="skeleton-line skeleton-shimmer short"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-shimmer" style="height: 48px; border-radius: 8px; margin-top: 16px;"></div>
+                </div>
+            </div>
+        `;
+    }
+
+    if (tabId === 'challenges') {
+        return `
+            <div class="skeleton-loader-container">
+                <div class="skeleton-grid-2">
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 60%;"></div>
+                        <div class="skeleton-line skeleton-shimmer" style="height: 50px; margin-top:10px;"></div>
+                    </div>
+                    <div class="skeleton-card">
+                        <div class="skeleton-title skeleton-shimmer" style="width: 60%;"></div>
+                        <div class="skeleton-line skeleton-shimmer" style="height: 50px; margin-top:10px;"></div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="skeleton-loader-container">
+            <div class="skeleton-card">
+                <div class="skeleton-title skeleton-shimmer"></div>
+                <div class="skeleton-line skeleton-shimmer"></div>
+                <div class="skeleton-line skeleton-shimmer short"></div>
+            </div>
+            <div class="skeleton-card">
+                <div class="skeleton-line skeleton-shimmer"></div>
+                <div class="skeleton-line skeleton-shimmer short"></div>
+            </div>
+        </div>
+    `;
+}
+
+function renderScreenForTab(tabId) {
+    if (tabId === 'dashboard') {
+        renderDashboard();
+    } else if (tabId === 'habits') {
+        renderHabitsScreen();
+    } else if (tabId === 'school') {
+        renderSchoolScreen();
+    } else if (tabId === 'journal') {
+        renderJournalScreen();
+    } else if (tabId === 'ai-coach') {
+        renderAIScreen();
+    } else if (tabId === 'prayers') {
+        renderPrayersScreen();
+    } else if (tabId === 'challenges') {
+        renderChallengesScreen();
+    } else if (tabId === 'pomodoro') {
+        renderFocusScreen();
+    }
+}
+
+function triggerSkeletonLoad(tabId) {
+    const tabPanel = document.getElementById(`tab-${tabId}`);
+    if (!tabPanel) {
+        renderScreenForTab(tabId);
+        return;
+    }
+
+    // 1. Hide actual components
+    const originalChildren = Array.from(tabPanel.children);
+    originalChildren.forEach(child => {
+        child.classList.add('content-hidden');
+    });
+
+    // 2. Add high fidelity shimmery skeleton overlay
+    const skeletonOverlay = document.createElement('div');
+    skeletonOverlay.className = 'skeleton-overlay-wrapper';
+    skeletonOverlay.style.width = '100%';
+    skeletonOverlay.style.padding = '4px 0';
+    skeletonOverlay.innerHTML = getSkeletonHtmlForTab(tabId);
+    
+    tabPanel.appendChild(skeletonOverlay);
+
+    // 3. Resolve load with simulated async transition (380ms)
+    setTimeout(() => {
+        skeletonOverlay.remove();
+        originalChildren.forEach(child => {
+            child.classList.remove('content-hidden');
+        });
+
+        // 4. Force specific screen repaint with correct database data
+        renderScreenForTab(tabId);
+    }, 380);
+}
+
+function switchTab(targetTab, skipSkeleton = false) {
+    const hubSubtabs = ['habits', 'pomodoro', 'school', 'prayers', 'journal', 'ai-coach', 'challenges', 'settings'];
+    
+    let activeMainTab = 'dashboard';
+    let activeSubtab = 'habits';
+
+    if (targetTab === 'dashboard') {
+        activeMainTab = 'dashboard';
+    } else if (targetTab === 'hub') {
+        activeMainTab = 'hub';
+        const activePill = document.querySelector('.hub-pill.active');
+        activeSubtab = activePill ? activePill.dataset.hubTab : 'habits';
+    } else if (hubSubtabs.includes(targetTab)) {
+        activeMainTab = 'hub';
+        activeSubtab = targetTab;
+    }
+
+    // 1. Toggle main tab panels
+    document.querySelectorAll('.app-content > .tab-panel').forEach(panel => {
+        panel.classList.toggle('active', panel.id === `tab-${activeMainTab}`);
+    });
+
+    // 2. Toggle bottom navigation bar active state
+    document.querySelectorAll('.app-bottom-nav .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === activeMainTab);
+    });
+
+    // 3. Toggle sidebar main navigation active state
+    document.querySelectorAll('.app-sidebar .nav-item').forEach(item => {
+        item.classList.toggle('active', item.dataset.tab === activeMainTab);
+    });
+
+    // 4. Update Studio Hub subpanels, pills, and shortcuts
+    if (activeMainTab === 'hub') {
+        document.querySelectorAll('.hub-pill').forEach(pill => {
+            pill.classList.toggle('active', pill.dataset.hubTab === activeSubtab);
+        });
+
+        document.querySelectorAll('.hub-subpanel').forEach(subpanel => {
+            subpanel.classList.toggle('active', subpanel.id === `tab-${activeSubtab}`);
+        });
+
+        document.querySelectorAll('.nav-shortcut-item').forEach(item => {
+            item.classList.toggle('active', item.dataset.hubTarget === activeSubtab);
+        });
+    } else {
+        document.querySelectorAll('.nav-shortcut-item').forEach(item => {
+            item.classList.remove('active');
+        });
+    }
+
+    // 5. Trigger Skeleton Load Transition
+    const screenToRender = activeMainTab === 'dashboard' ? 'dashboard' : activeSubtab;
+    if (!skipSkeleton) {
+        triggerSkeletonLoad(screenToRender);
+    } else {
+        renderScreenForTab(screenToRender);
+    }
+}
+
+// ====================================
+// CENTRALIZED MODAL & SUBJECT CONTROL
+// ====================================
+function openModal(modalId) {
+    try {
+        closeAllModals();
+
+        const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+        if (!modal) return;
+
+        modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.pointerEvents = 'auto';
+
+        document.body.classList.add('modal-open', 'overflow-hidden');
+        document.body.style.overflow = 'hidden';
+        document.body.style.pointerEvents = 'auto';
+
+        const firstInput = modal.querySelector('input:not([type="hidden"]), select, textarea, button:not(.modal-close)');
+        if (firstInput) {
+            setTimeout(() => {
+                try { firstInput.focus(); } catch (e) {}
+            }, 60);
+        }
+    } catch (err) {
+        console.error("Error opening modal:", err);
+    }
+}
+
+function closeModal(modalId) {
+    try {
+        if (!modalId) {
+            closeAllModals();
+            return;
+        }
+
+        const modal = typeof modalId === 'string' ? document.getElementById(modalId) : modalId;
+        if (modal) {
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+        }
+
+        document.querySelectorAll('.modal-backdrop, .modal-overlay-bg, .custom-backdrop').forEach(el => {
+            try { el.remove(); } catch (e) {}
+        });
+
+        document.body.classList.remove('modal-open', 'overflow-hidden', 'no-scroll');
+        document.documentElement.classList.remove('modal-open', 'overflow-hidden', 'no-scroll');
+        document.body.style.overflow = '';
+        document.body.style.pointerEvents = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
+
+        document.querySelectorAll('.app-header, .app-sidebar, .app-bottom-nav, .app-content, .tab-panel, .hub-subpanel').forEach(el => {
+            el.style.pointerEvents = 'auto';
+        });
+    } catch (err) {
+        console.error("Error closing modal:", err);
+    }
+}
+
+function closeAllModals() {
+    try {
+        document.querySelectorAll('.modal-overlay').forEach(modal => {
+            modal.classList.remove('active');
+            modal.style.display = 'none';
+        });
+
+        document.querySelectorAll('.modal-backdrop, .modal-overlay-bg, .custom-backdrop').forEach(el => {
+            try { el.remove(); } catch (e) {}
+        });
+
+        document.body.classList.remove('modal-open', 'overflow-hidden', 'no-scroll');
+        document.documentElement.classList.remove('modal-open', 'overflow-hidden', 'no-scroll');
+        document.body.style.overflow = '';
+        document.body.style.pointerEvents = 'auto';
+        document.documentElement.style.pointerEvents = 'auto';
+
+        document.querySelectorAll('.app-header, .app-sidebar, .app-bottom-nav, .app-content, .tab-panel, .hub-subpanel').forEach(el => {
+            el.style.pointerEvents = 'auto';
+        });
+    } catch (err) {
+        console.error("Error closing all modals:", err);
+    }
+}
+
+function updateSubjectDatalist() {
+    try {
+        const datalist = document.getElementById('subjects-datalist');
+        if (!datalist) return;
+        datalist.innerHTML = '';
+        
+        let subjectsList = state.subjects;
+        if (!subjectsList || !Array.isArray(subjectsList) || subjectsList.length === 0) {
+            subjectsList = ["PHYS202", "MATH201", "CHEM101", "CS101", "ENG102"];
+            state.subjects = subjectsList;
+        }
+
+        if (state.schoolTasks) {
+            state.schoolTasks.forEach(t => {
+                if (t.subject && !subjectsList.includes(t.subject)) {
+                    subjectsList.push(t.subject);
+                }
+            });
+        }
+
+        subjectsList.forEach(sub => {
+            const opt = document.createElement('option');
+            opt.value = sub;
+            datalist.appendChild(opt);
+        });
+    } catch (e) {
+        console.error("Error updating subject datalist:", e);
+    }
+}
+
 // --- Initialization Event Listeners ---
 document.addEventListener('DOMContentLoaded', () => {
     loadState();
     
-    // Setup initial routes / single page navigation
-    document.querySelectorAll('[data-tab]').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const targetTab = btn.dataset.tab;
-            
-            // Switch tabs
-            document.querySelectorAll('.tab-panel').forEach(panel => {
-                panel.classList.toggle('active', panel.id === `tab-${targetTab}`);
-            });
-            
-            // Toggle sidebar active state
-            document.querySelectorAll('.app-sidebar .nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.tab === targetTab);
-            });
+    // Global Backdrop Click Handler to dismiss modals safely
+    document.addEventListener('click', (e) => {
+        if (e.target && e.target.classList && e.target.classList.contains('modal-overlay')) {
+            closeModal(e.target);
+        }
+    });
 
-            // Toggle bottom nav active state
-            document.querySelectorAll('.app-bottom-nav .nav-item').forEach(item => {
-                item.classList.toggle('active', item.dataset.tab === targetTab);
-            });
-            
-            renderAllScreens();
+    // Escape Key Handler to dismiss open modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeAllModals();
+        }
+    });
+    
+    // Setup 2-Tab Navigation Listeners
+    document.querySelectorAll('[data-tab]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const targetTab = btn.dataset.tab;
+            switchTab(targetTab);
         });
     });
+
+    // Setup Sidebar Shortcut Listeners
+    document.querySelectorAll('.nav-shortcut-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.hubTarget;
+            switchTab(target);
+        });
+    });
+
+    // Setup Studio Hub Pill Listeners
+    document.querySelectorAll('.hub-pill').forEach(pill => {
+        pill.addEventListener('click', () => {
+            const target = pill.dataset.hubTab;
+            switchTab(target);
+        });
+    });
+
+    // Setup .btn-go-tab navigation links
+    document.querySelectorAll('.btn-go-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const target = btn.dataset.target;
+            switchTab(target);
+        });
+    });
+
+    // Initial render
+    switchTab('dashboard', false);
 
     // Routine morning/evening filter toggle
     document.querySelectorAll('.routine-filter .filter-btn').forEach(btn => {
@@ -2346,232 +2853,268 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Weekly Reflection Saving Submit
-    document.getElementById('journal-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const weekEndingVal = document.getElementById('entry-week-selector').value;
-        const reflection = document.getElementById('entry-reflection').value;
-        const grateful = document.getElementById('entry-grateful').value;
-        
-        // Get linked checked habits
-        const linkedHabitIds = [];
-        document.querySelectorAll('input[name="journal-linked-habits"]:checked').forEach(c => {
-            linkedHabitIds.push(c.value);
+    const journalForm = document.getElementById('journal-form');
+    if (journalForm) {
+        journalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            const weekEndingVal = document.getElementById('entry-week-selector')?.value || '';
+            const reflection = document.getElementById('entry-reflection')?.value || '';
+            const grateful = document.getElementById('entry-grateful')?.value || '';
+            
+            // Get linked checked habits
+            const linkedHabitIds = [];
+            document.querySelectorAll('input[name="journal-linked-habits"]:checked').forEach(c => {
+                linkedHabitIds.push(c.value);
+            });
+
+            if (!state.weeklyReflections) state.weeklyReflections = [];
+            
+            let existingIndex = state.weeklyReflections.findIndex(r => r.weekEnding === weekEndingVal);
+            const reflectionObj = {
+                weekEnding: weekEndingVal,
+                reflection: reflection,
+                gratefulFor: grateful,
+                habitsReviewed: linkedHabitIds
+            };
+            
+            if (existingIndex >= 0) {
+                state.weeklyReflections[existingIndex] = reflectionObj;
+            } else {
+                state.weeklyReflections.push(reflectionObj);
+            }
+
+            // Recovery path for Level 5 Failure
+            let restoredStreak = false;
+            if (state.level5Failure) {
+                state.level5Failure = false;
+                restoredStreak = true;
+            }
+
+            saveToLocalStorage();
+            evaluateChallengesAndBadges();
+            renderJournalScreen();
+            renderDashboard();
+            playFocusChime();
+            
+            if (restoredStreak) {
+                alert("💖 Apology Weekly Reflection logged successfully! Your Level 5 Lockdown is cleared and your streak has been restored.");
+            } else {
+                alert("Weekly Reflection saved successfully!");
+            }
         });
-
-        if (!state.weeklyReflections) state.weeklyReflections = [];
-        
-        let existingIndex = state.weeklyReflections.findIndex(r => r.weekEnding === weekEndingVal);
-        const reflectionObj = {
-            weekEnding: weekEndingVal,
-            reflection: reflection,
-            gratefulFor: grateful,
-            habitsReviewed: linkedHabitIds
-        };
-        
-        if (existingIndex >= 0) {
-            state.weeklyReflections[existingIndex] = reflectionObj;
-        } else {
-            state.weeklyReflections.push(reflectionObj);
-        }
-
-        // Recovery path for Level 5 Failure
-        let restoredStreak = false;
-        if (state.level5Failure) {
-            state.level5Failure = false;
-            restoredStreak = true;
-        }
-
-        saveToLocalStorage();
-        evaluateChallengesAndBadges();
-        renderJournalScreen();
-        renderDashboard();
-        playFocusChime();
-        
-        if (restoredStreak) {
-            alert("💖 Apology Weekly Reflection logged successfully! Your Level 5 Lockdown is cleared and your streak has been restored.");
-        } else {
-            alert("Weekly Reflection saved successfully!");
-        }
-    });
+    }
 
     // Task Checkpoints / Habit completions on Dashboard
-    document.getElementById('dashboard-today-list').addEventListener('click', (e) => {
-        const todayStr = getTodayString();
-        
-        // Yes/No Checkbox triggers
-        if (e.target.classList.contains('habit-check-click')) {
-            const habitId = e.target.dataset.id;
-            const completed = e.target.checked;
+    const dashboardTodayList = document.getElementById('dashboard-today-list');
+    if (dashboardTodayList) {
+        dashboardTodayList.addEventListener('click', (e) => {
+            const todayStr = getTodayString();
             
-            if (!state.logs[todayStr]) state.logs[todayStr] = {};
-            state.logs[todayStr][habitId] = { value: completed ? 1 : 0, completed: completed };
-            
-            saveToLocalStorage();
-            evaluateChallengesAndBadges();
-            renderAllScreens();
-            
-            if (completed) playFocusChime();
-        }
-        
-        // Count/Duration Increments
-        if (e.target.classList.contains('num-inc')) {
-            const habitId = e.target.dataset.id;
-            const habit = state.habits.find(h => h.id === habitId);
-            
-            if (!state.logs[todayStr]) state.logs[todayStr] = {};
-            if (!state.logs[todayStr][habitId]) state.logs[todayStr][habitId] = { value: 0, completed: false };
-            
-            state.logs[todayStr][habitId].value++;
-            if (state.logs[todayStr][habitId].value >= habit.target) {
-                state.logs[todayStr][habitId].completed = true;
-                playFocusChime();
+            // Yes/No Checkbox triggers
+            if (e.target.classList.contains('habit-check-click')) {
+                const habitId = e.target.dataset.id;
+                const completed = e.target.checked;
+                
+                if (!state.logs[todayStr]) state.logs[todayStr] = {};
+                state.logs[todayStr][habitId] = { value: completed ? 1 : 0, completed: completed };
+                
+                saveToLocalStorage();
+                evaluateChallengesAndBadges();
+                renderAllScreens();
+                
+                if (completed) playFocusChime();
             }
             
-            saveToLocalStorage();
-            evaluateChallengesAndBadges();
-            renderAllScreens();
-        }
+            // Count/Duration Increments
+            if (e.target.classList.contains('num-inc')) {
+                const habitId = e.target.dataset.id;
+                const habit = state.habits.find(h => h.id === habitId);
+                
+                if (!state.logs[todayStr]) state.logs[todayStr] = {};
+                if (!state.logs[todayStr][habitId]) state.logs[todayStr][habitId] = { value: 0, completed: false };
+                
+                state.logs[todayStr][habitId].value++;
+                if (state.logs[todayStr][habitId].value >= habit.target) {
+                    state.logs[todayStr][habitId].completed = true;
+                    playFocusChime();
+                }
+                
+                saveToLocalStorage();
+                evaluateChallengesAndBadges();
+                renderAllScreens();
+            }
 
-        // Count/Duration Decrements
-        if (e.target.classList.contains('num-dec')) {
-            const habitId = e.target.dataset.id;
-            const habit = state.habits.find(h => h.id === habitId);
-            
-            if (!state.logs[todayStr] || !state.logs[todayStr][habitId]) return;
-            
-            state.logs[todayStr][habitId].value = Math.max(0, state.logs[todayStr][habitId].value - 1);
-            if (state.logs[todayStr][habitId].value < habit.target) {
-                state.logs[todayStr][habitId].completed = false;
+            // Count/Duration Decrements
+            if (e.target.classList.contains('num-dec')) {
+                const habitId = e.target.dataset.id;
+                const habit = state.habits.find(h => h.id === habitId);
+                
+                if (!state.logs[todayStr] || !state.logs[todayStr][habitId]) return;
+                
+                state.logs[todayStr][habitId].value = Math.max(0, state.logs[todayStr][habitId].value - 1);
+                if (state.logs[todayStr][habitId].value < habit.target) {
+                    state.logs[todayStr][habitId].completed = false;
+                }
+                
+                saveToLocalStorage();
+                evaluateChallengesAndBadges();
+                renderAllScreens();
             }
-            
-            saveToLocalStorage();
-            evaluateChallengesAndBadges();
-            renderAllScreens();
-        }
-    });
+        });
+    }
 
     // School planner mark done / revert triggers
     const handleSchoolColClick = (e) => {
-        if (e.target.classList.contains('task-done-click')) {
-            const id = e.target.dataset.id;
-            const task = state.schoolTasks.find(t => t.id === id);
-            if (task) {
-                // Trigger Accountability Academic Verification Modal instead of auto-completing
-                const verifyModal = document.getElementById('school-verify-modal');
-                if (verifyModal) {
-                    document.getElementById('school-verify-task-id').value = id;
-                    document.getElementById('school-verify-task-title').textContent = `📝 Objective: ${task.title} (${task.type.toUpperCase()})`;
-                    document.getElementById('school-verify-reflection').value = '';
-                    document.getElementById('school-verify-file').value = '';
-                    document.getElementById('school-verify-file-lbl').textContent = "Select or snap photo proof";
-                    document.getElementById('school-verify-preview-container').style.display = 'none';
-                    
-                    document.getElementById('school-verify-form').style.display = 'block';
-                    document.getElementById('school-verify-loading').style.display = 'none';
-                    document.getElementById('school-verify-success').style.display = 'none';
-                    
-                    verifyModal.classList.add('active');
-                } else {
-                    // Fallback if modal is missing
-                    task.completed = true;
-                    playFocusChime();
+        try {
+            if (e.target.classList.contains('task-done-click')) {
+                const id = e.target.dataset.id;
+                const task = state.schoolTasks.find(t => t.id === id);
+                if (task) {
+                    // Trigger Accountability Academic Verification Modal instead of auto-completing
+                    const verifyModal = document.getElementById('school-verify-modal');
+                    if (verifyModal) {
+                        document.getElementById('school-verify-task-id').value = id;
+                        document.getElementById('school-verify-task-title').textContent = `📝 Objective: ${task.title} (${task.type.toUpperCase()})`;
+                        document.getElementById('school-verify-reflection').value = '';
+                        document.getElementById('school-verify-file').value = '';
+                        document.getElementById('school-verify-file-lbl').textContent = "Select or snap photo proof";
+                        document.getElementById('school-verify-preview-container').style.display = 'none';
+                        
+                        document.getElementById('school-verify-form').style.display = 'block';
+                        document.getElementById('school-verify-loading').style.display = 'none';
+                        document.getElementById('school-verify-success').style.display = 'none';
+                        
+                        openModal('school-verify-modal');
+                    } else {
+                        // Fallback if modal is missing
+                        task.completed = true;
+                        playFocusChime();
+                        saveToLocalStorage();
+                        evaluateChallengesAndBadges();
+                        renderSchoolScreen();
+                        renderDashboard();
+                    }
+                }
+            }
+            if (e.target.classList.contains('task-revert-click')) {
+                const id = e.target.dataset.id;
+                const task = state.schoolTasks.find(t => t.id === id);
+                if (task) {
+                    task.completed = false;
                     saveToLocalStorage();
                     evaluateChallengesAndBadges();
                     renderSchoolScreen();
                     renderDashboard();
                 }
             }
-        }
-        if (e.target.classList.contains('task-revert-click')) {
-            const id = e.target.dataset.id;
-            const task = state.schoolTasks.find(t => t.id === id);
-            if (task) {
-                task.completed = false;
-                saveToLocalStorage();
-                evaluateChallengesAndBadges();
-                renderSchoolScreen();
-                renderDashboard();
-            }
+        } catch (err) {
+            console.error("Error in school column click handler:", err);
         }
     };
-    document.getElementById('school-todo-list').addEventListener('click', handleSchoolColClick);
-    document.getElementById('school-completed-list').addEventListener('click', handleSchoolColClick);
+    const todoListEl = document.getElementById('school-todo-list');
+    if (todoListEl) todoListEl.addEventListener('click', handleSchoolColClick);
+    const completedListEl = document.getElementById('school-completed-list');
+    if (completedListEl) completedListEl.addEventListener('click', handleSchoolColClick);
 
     // Open score details analytics modal on dashboard click
-    document.getElementById('header-productivity-btn').addEventListener('click', () => {
-        const modal = document.getElementById('analytics-modal');
-        const score = calculateProductivityScore();
-        document.getElementById('detail-score-display').textContent = score.overall;
-        
-        let label = "Stable Performance";
-        if (score.overall >= 80) label = "Excellent Academic & Habit Synchronization!";
-        else if (score.overall >= 50) label = "Positive Trajectory. Keep Logging.";
-        else label = "Critical Momentum Required. Anchor focus sprints.";
-        
-        document.getElementById('detail-score-quality').textContent = label;
-        modal.classList.add('active');
-    });
+    const headerProdBtn = document.getElementById('header-productivity-btn');
+    if (headerProdBtn) {
+        headerProdBtn.addEventListener('click', () => {
+            try {
+                const score = calculateProductivityScore();
+                document.getElementById('detail-score-display').textContent = score.overall;
+                
+                let label = "Stable Performance";
+                if (score.overall >= 80) label = "Excellent Academic & Habit Synchronization!";
+                else if (score.overall >= 50) label = "Positive Trajectory. Keep Logging.";
+                else label = "Critical Momentum Required. Anchor focus sprints.";
+                
+                document.getElementById('detail-score-quality').textContent = label;
+                openModal('analytics-modal');
+            } catch (err) {
+                console.error("Error launching analytics modal:", err);
+            }
+        });
+    }
 
     // General Modal dismiss buttons
     document.querySelectorAll('.modal-close').forEach(btn => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
             const targetModal = btn.dataset.modal;
-            document.getElementById(targetModal).classList.remove('active');
+            if (targetModal) {
+                closeModal(targetModal);
+            } else {
+                const parentModal = btn.closest('.modal-overlay');
+                closeModal(parentModal);
+            }
         });
     });
 
     // Create Habit modal trigger
-    document.getElementById('add-habit-btn').addEventListener('click', () => {
-        document.getElementById('habit-form').reset();
-        document.getElementById('habit-edit-id').value = '';
-        document.getElementById('habit-modal-title').textContent = 'Create New Habit';
-        document.getElementById('habit-delete-btn').style.display = 'none';
-        
-        // Reset custom Atomic fields
-        document.getElementById('habit-impl-time').value = '';
-        document.getElementById('habit-impl-loc').value = '';
-        document.getElementById('habit-2min-version').value = '';
-        document.getElementById('habit-temptation').value = '';
-        
-        document.getElementById('habit-modal').classList.add('active');
-    });
+    const addHabitBtn = document.getElementById('add-habit-btn');
+    if (addHabitBtn) {
+        addHabitBtn.addEventListener('click', () => {
+            try {
+                document.getElementById('habit-form').reset();
+                document.getElementById('habit-edit-id').value = '';
+                document.getElementById('habit-modal-title').textContent = 'Create New Habit';
+                document.getElementById('habit-delete-btn').style.display = 'none';
+                
+                // Reset custom Atomic fields
+                document.getElementById('habit-impl-time').value = '';
+                document.getElementById('habit-impl-loc').value = '';
+                document.getElementById('habit-2min-version').value = '';
+                document.getElementById('habit-temptation').value = '';
+                
+                openModal('habit-modal');
+            } catch (err) {
+                console.error("Error opening habit modal:", err);
+            }
+        });
+    }
 
     // Edit/Manage Habit card click triggers
-    document.getElementById('habits-list-container').addEventListener('click', (e) => {
-        if (e.target.classList.contains('btn-edit-habit')) {
-            const id = e.target.dataset.id;
-            const habit = state.habits.find(h => h.id === id);
-            if (habit) {
-                document.getElementById('habit-edit-id').value = habit.id;
-                document.getElementById('habit-name').value = habit.name;
-                document.getElementById('habit-category').value = habit.category;
-                document.getElementById('habit-routine').value = habit.routine;
-                document.getElementById('habit-type').value = habit.type;
-                document.getElementById('habit-target').value = habit.target;
-                document.getElementById('habit-schedule').value = habit.schedule;
-                document.getElementById('habit-notes').value = habit.notes || '';
-                
-                // Populate custom Atomic fields
-                document.getElementById('habit-impl-time').value = habit.implementationTime || '';
-                document.getElementById('habit-impl-loc').value = habit.implementationLocation || '';
-                document.getElementById('habit-2min-version').value = habit.twoMinVersion || '';
-                document.getElementById('habit-temptation').value = habit.temptationReward || '';
-                
-                // Show delete button
-                document.getElementById('habit-delete-btn').style.display = 'block';
-                document.getElementById('habit-modal-title').textContent = 'Modify Habit Vault';
-                
-                // Set color dots active state
-                document.querySelectorAll('.color-palette-selector .color-dot').forEach(dot => {
-                    dot.classList.toggle('active', dot.dataset.color === habit.color);
-                });
-                document.getElementById('habit-color').value = habit.color;
+    const habitsListCont = document.getElementById('habits-list-container');
+    if (habitsListCont) {
+        habitsListCont.addEventListener('click', (e) => {
+            try {
+                if (e.target.classList.contains('btn-edit-habit')) {
+                    const id = e.target.dataset.id;
+                    const habit = state.habits.find(h => h.id === id);
+                    if (habit) {
+                        document.getElementById('habit-edit-id').value = habit.id;
+                        document.getElementById('habit-name').value = habit.name;
+                        document.getElementById('habit-category').value = habit.category;
+                        document.getElementById('habit-routine').value = habit.routine;
+                        document.getElementById('habit-type').value = habit.type;
+                        document.getElementById('habit-target').value = habit.target;
+                        document.getElementById('habit-schedule').value = habit.schedule;
+                        document.getElementById('habit-notes').value = habit.notes || '';
+                        
+                        document.getElementById('habit-impl-time').value = habit.implementationTime || '';
+                        document.getElementById('habit-impl-loc').value = habit.implementationLocation || '';
+                        document.getElementById('habit-2min-version').value = habit.twoMinVersion || '';
+                        document.getElementById('habit-temptation').value = habit.temptationReward || '';
+                        
+                        document.getElementById('habit-delete-btn').style.display = 'block';
+                        document.getElementById('habit-modal-title').textContent = 'Modify Habit Vault';
+                        
+                        document.querySelectorAll('.color-palette-selector .color-dot').forEach(dot => {
+                            dot.classList.toggle('active', dot.dataset.color === habit.color);
+                        });
+                        document.getElementById('habit-color').value = habit.color;
 
-                document.getElementById('habit-modal').classList.add('active');
+                        openModal('habit-modal');
+                    }
+                }
+            } catch (err) {
+                console.error("Error editing habit card:", err);
             }
-        }
-    });
+        });
+    }
 
     // Color palette dot selection events inside habit creation modal
     document.querySelectorAll('.color-palette-selector .color-dot').forEach(dot => {
@@ -2583,175 +3126,278 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Custom Category Input handling
-    document.getElementById('habit-category').addEventListener('change', (e) => {
-        const isCustom = e.target.value === 'Custom';
-        document.getElementById('habit-custom-category').style.display = isCustom ? 'block' : 'none';
-    });
+    const habitCatSel = document.getElementById('habit-category');
+    if (habitCatSel) {
+        habitCatSel.addEventListener('change', (e) => {
+            const isCustom = e.target.value === 'Custom';
+            document.getElementById('habit-custom-category').style.display = isCustom ? 'block' : 'none';
+        });
+    }
 
     // Custom repeat days checklist container
-    document.getElementById('habit-schedule').addEventListener('change', (e) => {
-        const isCustomDays = e.target.value === 'custom';
-        document.getElementById('habit-custom-days').style.display = isCustomDays ? 'flex' : 'none';
-    });
+    const habitSchedSel = document.getElementById('habit-schedule');
+    if (habitSchedSel) {
+        habitSchedSel.addEventListener('change', (e) => {
+            const isCustomDays = e.target.value === 'custom';
+            document.getElementById('habit-custom-days').style.display = isCustomDays ? 'flex' : 'none';
+        });
+    }
 
     // Submit Habit Form (Insert / Update)
-    document.getElementById('habit-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const editId = document.getElementById('habit-edit-id').value;
-        const name = document.getElementById('habit-name').value;
-        const routine = document.getElementById('habit-routine').value;
-        const type = document.getElementById('habit-type').value;
-        const target = parseInt(document.getElementById('habit-target').value) || 1;
-        const schedule = document.getElementById('habit-schedule').value;
-        const notes = document.getElementById('habit-notes').value;
-        const color = document.getElementById('habit-color').value;
+    const habitForm = document.getElementById('habit-form');
+    if (habitForm) {
+        habitForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            try {
+                const editId = document.getElementById('habit-edit-id').value;
+                const name = document.getElementById('habit-name').value;
+                const routine = document.getElementById('habit-routine').value;
+                const type = document.getElementById('habit-type').value;
+                const target = parseInt(document.getElementById('habit-target').value) || 1;
+                const schedule = document.getElementById('habit-schedule').value;
+                const notes = document.getElementById('habit-notes').value;
+                const color = document.getElementById('habit-color').value;
 
-        // Custom Atomic fields
-        const implementationTime = document.getElementById('habit-impl-time').value;
-        const implementationLocation = document.getElementById('habit-impl-loc').value;
-        const twoMinVersion = document.getElementById('habit-2min-version').value;
-        const temptationReward = document.getElementById('habit-temptation').value;
+                const implementationTime = document.getElementById('habit-impl-time').value;
+                const implementationLocation = document.getElementById('habit-impl-loc').value;
+                const twoMinVersion = document.getElementById('habit-2min-version').value;
+                const temptationReward = document.getElementById('habit-temptation').value;
 
-        let category = document.getElementById('habit-category').value;
-        if (category === 'Custom') {
-            category = document.getElementById('habit-custom-category').value || 'General';
-        }
+                let category = document.getElementById('habit-category').value;
+                if (category === 'Custom') {
+                    category = document.getElementById('habit-custom-category').value || 'General';
+                }
 
-        // Get checked custom days
-        const customDays = [];
-        if (schedule === 'custom') {
-            document.querySelectorAll('#habit-custom-days input:checked').forEach(c => {
-                customDays.push(parseInt(c.value));
-            });
-        }
+                const customDays = [];
+                if (schedule === 'custom') {
+                    document.querySelectorAll('#habit-custom-days input:checked').forEach(c => {
+                        customDays.push(parseInt(c.value));
+                    });
+                }
 
-        if (editId) {
-            // Update mode
-            const index = state.habits.findIndex(h => h.id === editId);
-            if (index !== -1) {
-                state.habits[index] = { 
-                    ...state.habits[index], 
-                    name, category, routine, type, target, schedule, days: customDays, color, notes,
-                    implementationTime, implementationLocation, twoMinVersion, temptationReward
-                };
+                if (editId) {
+                    const index = state.habits.findIndex(h => h.id === editId);
+                    if (index !== -1) {
+                        state.habits[index] = { 
+                            ...state.habits[index], 
+                            name, category, routine, type, target, schedule, days: customDays, color, notes,
+                            implementationTime, implementationLocation, twoMinVersion, temptationReward
+                        };
+                    }
+                } else {
+                    const newHabit = {
+                        id: 'habit_' + Date.now(),
+                        name, category, routine, type, target, schedule, days: customDays, color, notes,
+                        implementationTime, implementationLocation, twoMinVersion, temptationReward,
+                        archived: false
+                    };
+                    state.habits.push(newHabit);
+                }
+
+                saveToLocalStorage();
+                evaluateChallengesAndBadges();
+                renderAllScreens();
+                playFocusChime();
+            } catch (err) {
+                console.error("Error saving habit:", err);
+            } finally {
+                closeModal('habit-modal');
             }
-        } else {
-            // Create mode
-            const newHabit = {
-                id: 'habit_' + Date.now(),
-                name, category, routine, type, target, schedule, days: customDays, color, notes,
-                implementationTime, implementationLocation, twoMinVersion, temptationReward,
-                archived: false
-            };
-            state.habits.push(newHabit);
-        }
-
-        saveToLocalStorage();
-        evaluateChallengesAndBadges();
-        document.getElementById('habit-modal').classList.remove('active');
-        renderAllScreens();
-        playFocusChime();
-    });
+        });
+    }
 
     // Delete Habit action
-    document.getElementById('habit-delete-btn').addEventListener('click', () => {
-        const editId = document.getElementById('habit-edit-id').value;
-        if (editId && confirm("Are you sure you want to delete this habit? All historic records for this habit will be detached.")) {
-            state.habits = state.habits.filter(h => h.id !== editId);
-            saveToLocalStorage();
-            document.getElementById('habit-modal').classList.remove('active');
-            renderAllScreens();
-        }
-    });
+    const habitDeleteBtn = document.getElementById('habit-delete-btn');
+    if (habitDeleteBtn) {
+        habitDeleteBtn.addEventListener('click', () => {
+            try {
+                const editId = document.getElementById('habit-edit-id').value;
+                if (editId && confirm("Are you sure you want to delete this habit? All historic records for this habit will be detached.")) {
+                    state.habits = state.habits.filter(h => h.id !== editId);
+                    saveToLocalStorage();
+                    renderAllScreens();
+                }
+            } catch (err) {
+                console.error("Error deleting habit:", err);
+            } finally {
+                closeModal('habit-modal');
+            }
+        });
+    }
+
+    // --- ADD / EDIT SUBJECT MODAL & LOGIC ---
+    updateSubjectDatalist();
+
+    const addSubjectBtn = document.getElementById('add-subject-btn');
+    if (addSubjectBtn) {
+        addSubjectBtn.addEventListener('click', () => {
+            try {
+                const subjectForm = document.getElementById('subject-form');
+                if (subjectForm) subjectForm.reset();
+                openModal('subject-modal');
+            } catch (err) {
+                console.error("Error launching Add Subject modal:", err);
+                closeModal('subject-modal');
+            }
+        });
+    }
+
+    const subjectForm = document.getElementById('subject-form');
+    if (subjectForm) {
+        subjectForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            try {
+                const nameInput = document.getElementById('subject-name');
+                const subjectName = nameInput ? nameInput.value.trim() : '';
+
+                if (subjectName) {
+                    if (!state.subjects) state.subjects = [];
+                    if (!state.subjects.includes(subjectName)) {
+                        state.subjects.push(subjectName);
+                        saveToLocalStorage();
+                    }
+                    updateSubjectDatalist();
+                    renderSchoolScreen();
+                    renderDashboard();
+                }
+            } catch (err) {
+                console.error("Error creating subject:", err);
+            } finally {
+                closeModal('subject-modal');
+            }
+        });
+    }
 
     // School planner modals and forms
-    document.getElementById('add-school-task-btn').addEventListener('click', () => {
-        document.getElementById('school-form').reset();
-        document.getElementById('school-edit-id').value = '';
-        document.getElementById('school-modal-title').textContent = 'Add School Task';
-        document.getElementById('school-delete-btn').style.display = 'none';
-        
-        // Auto default tomorrow's date
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        document.getElementById('school-due').value = tomorrow.toISOString().split('T')[0];
-        
-        document.getElementById('school-modal').classList.add('active');
-    });
+    const addSchoolTaskBtn = document.getElementById('add-school-task-btn');
+    if (addSchoolTaskBtn) {
+        addSchoolTaskBtn.addEventListener('click', () => {
+            try {
+                const schoolForm = document.getElementById('school-form');
+                if (schoolForm) schoolForm.reset();
+                
+                const editIdEl = document.getElementById('school-edit-id');
+                if (editIdEl) editIdEl.value = '';
+                
+                const titleEl = document.getElementById('school-modal-title');
+                if (titleEl) titleEl.textContent = 'Add School Task';
+                
+                const deleteBtn = document.getElementById('school-delete-btn');
+                if (deleteBtn) deleteBtn.style.display = 'none';
+                
+                const tomorrow = new Date();
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                const dueEl = document.getElementById('school-due');
+                if (dueEl) dueEl.value = tomorrow.toISOString().split('T')[0];
+                
+                updateSubjectDatalist();
+                openModal('school-modal');
+            } catch (err) {
+                console.error("Error launching Add School Task modal:", err);
+                closeModal('school-modal');
+            }
+        });
+    }
 
     // Save School Planner Task
-    document.getElementById('school-form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        
-        const editId = document.getElementById('school-edit-id').value;
-        const title = document.getElementById('school-title').value;
-        const type = document.getElementById('school-type').value;
-        const due = document.getElementById('school-due').value;
-        const subject = document.getElementById('school-subject').value;
-        const notes = document.getElementById('school-notes').value;
+    const schoolForm = document.getElementById('school-form');
+    if (schoolForm) {
+        schoolForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            try {
+                const editId = document.getElementById('school-edit-id').value;
+                const title = document.getElementById('school-title').value;
+                const type = document.getElementById('school-type').value;
+                const due = document.getElementById('school-due').value;
+                const subject = document.getElementById('school-subject').value;
+                const notes = document.getElementById('school-notes').value;
 
-        if (editId) {
-            const index = state.schoolTasks.findIndex(t => t.id === editId);
-            if (index !== -1) {
-                state.schoolTasks[index] = { ...state.schoolTasks[index], title, type, due, subject, notes };
+                if (editId) {
+                    const index = state.schoolTasks.findIndex(t => t.id === editId);
+                    if (index !== -1) {
+                        state.schoolTasks[index] = { ...state.schoolTasks[index], title, type, due, subject, notes };
+                    }
+                } else {
+                    const newTask = {
+                        id: 'school_' + Date.now(),
+                        title, type, due, subject, notes,
+                        completed: false
+                    };
+                    state.schoolTasks.push(newTask);
+                }
+
+                if (subject && subject.trim()) {
+                    if (!state.subjects) state.subjects = [];
+                    const trimmedSub = subject.trim();
+                    if (!state.subjects.includes(trimmedSub)) {
+                        state.subjects.push(trimmedSub);
+                    }
+                }
+
+                saveToLocalStorage();
+                evaluateChallengesAndBadges();
+                updateSubjectDatalist();
+                renderSchoolScreen();
+                renderDashboard();
+                playFocusChime();
+            } catch (err) {
+                console.error("Error saving school task:", err);
+            } finally {
+                closeModal('school-modal');
             }
-        } else {
-            const newTask = {
-                id: 'school_' + Date.now(),
-                title, type, due, subject, notes,
-                completed: false
-            };
-            state.schoolTasks.push(newTask);
-        }
-
-        saveToLocalStorage();
-        evaluateChallengesAndBadges();
-        document.getElementById('school-modal').classList.remove('active');
-        renderSchoolScreen();
-        renderDashboard();
-        playFocusChime();
-    });
+        });
+    }
 
     // Trigger school Column task details edit modal
     const editSchoolTaskTrigger = (e) => {
-        const card = e.target.closest('.school-task-card');
-        if (card && !e.target.classList.contains('task-done-click') && !e.target.classList.contains('task-revert-click')) {
-            const id = card.dataset.id;
-            const task = state.schoolTasks.find(t => t.id === id);
-            if (task) {
-                document.getElementById('school-edit-id').value = task.id;
-                document.getElementById('school-title').value = task.title;
-                document.getElementById('school-type').value = task.type;
-                document.getElementById('school-due').value = task.due;
-                document.getElementById('school-subject').value = task.subject || '';
-                document.getElementById('school-notes').value = task.notes || '';
-                
-                document.getElementById('school-delete-btn').style.display = 'block';
-                document.getElementById('school-modal-title').textContent = 'Modify School Planner';
-                document.getElementById('school-modal').classList.add('active');
+        try {
+            const card = e.target.closest('.school-task-card');
+            if (card && !e.target.classList.contains('task-done-click') && !e.target.classList.contains('task-revert-click')) {
+                const id = card.dataset.id;
+                const task = state.schoolTasks.find(t => t.id === id);
+                if (task) {
+                    document.getElementById('school-edit-id').value = task.id;
+                    document.getElementById('school-title').value = task.title;
+                    document.getElementById('school-type').value = task.type;
+                    document.getElementById('school-due').value = task.due;
+                    document.getElementById('school-subject').value = task.subject || '';
+                    document.getElementById('school-notes').value = task.notes || '';
+                    
+                    document.getElementById('school-delete-btn').style.display = 'block';
+                    document.getElementById('school-modal-title').textContent = 'Modify School Planner';
+                    updateSubjectDatalist();
+                    openModal('school-modal');
+                }
             }
+        } catch (err) {
+            console.error("Error editing school task trigger:", err);
         }
     };
-    document.getElementById('school-todo-list').addEventListener('click', editSchoolTaskTrigger);
-    document.getElementById('school-completed-list').addEventListener('click', editSchoolTaskTrigger);
 
     // Delete school task
-    document.getElementById('school-delete-btn').addEventListener('click', () => {
-        const editId = document.getElementById('school-edit-id').value;
-        if (editId) {
-            state.schoolTasks = state.schoolTasks.filter(t => t.id !== editId);
-            saveToLocalStorage();
-            document.getElementById('school-modal').classList.remove('active');
-            renderSchoolScreen();
-            renderDashboard();
-        }
-    });
+    const schoolDeleteBtn = document.getElementById('school-delete-btn');
+    if (schoolDeleteBtn) {
+        schoolDeleteBtn.addEventListener('click', () => {
+            try {
+                const editId = document.getElementById('school-edit-id').value;
+                if (editId) {
+                    state.schoolTasks = state.schoolTasks.filter(t => t.id !== editId);
+                    saveToLocalStorage();
+                    renderSchoolScreen();
+                    renderDashboard();
+                }
+            } catch (err) {
+                console.error("Error deleting school task:", err);
+            } finally {
+                closeModal('school-modal');
+            }
+        });
+    }
 
     // Habits Filter Change events
-    document.getElementById('habit-search').addEventListener('input', renderHabitsScreen);
-    document.getElementById('habit-category-filter').addEventListener('change', renderHabitsScreen);
-    document.getElementById('habit-status-filter').addEventListener('change', renderHabitsScreen);
+    document.getElementById('habit-search')?.addEventListener('input', renderHabitsScreen);
+    document.getElementById('habit-category-filter')?.addEventListener('change', renderHabitsScreen);
+    document.getElementById('habit-status-filter')?.addEventListener('change', renderHabitsScreen);
 
     // Focus mode linked selectors
     document.querySelectorAll('.timer-mode-btn').forEach(btn => {
@@ -2761,25 +3407,25 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Focus controls click handlers
-    document.getElementById('timer-play-pause').addEventListener('click', toggleTimer);
-    document.getElementById('timer-reset').addEventListener('click', () => {
+    document.getElementById('timer-play-pause')?.addEventListener('click', toggleTimer);
+    document.getElementById('timer-reset')?.addEventListener('click', () => {
         setTimerMode(timerState.mode);
     });
-    document.getElementById('timer-skip').addEventListener('click', () => {
+    document.getElementById('timer-skip')?.addEventListener('click', () => {
         handleTimerComplete();
     });
 
     // Conversational Chat AI prompt send click
-    document.getElementById('chat-send-btn').addEventListener('click', () => {
+    document.getElementById('chat-send-btn')?.addEventListener('click', () => {
         const input = document.getElementById('chat-input');
-        const text = input.value.trim();
+        const text = input ? input.value.trim() : '';
         if (text) {
             askAICoach(text);
-            input.value = '';
+            if (input) input.value = '';
         }
     });
 
-    document.getElementById('chat-input').addEventListener('keypress', (e) => {
+    document.getElementById('chat-input')?.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') {
             const text = e.target.value.trim();
             if (text) {
@@ -2803,10 +3449,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // Weekly AI Review compiler
-    document.getElementById('generate-review-btn').addEventListener('click', () => {
+    document.getElementById('generate-review-btn')?.addEventListener('click', () => {
         const reviewBox = document.getElementById('review-output-container');
-        reviewBox.classList.remove('empty');
-        reviewBox.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">analytics</span><p>Processing weekly stats and formulating directives...</p></div>`;
+        if (reviewBox) {
+            reviewBox.classList.remove('empty');
+            reviewBox.innerHTML = `<div class="empty-state"><span class="material-symbols-outlined">analytics</span><p>Processing weekly stats and formulating directives...</p></div>`;
+        }
 
         const reviewPrompt = `Generate a comprehensive "Weekly Performance Review" for Oumar. Summarize his achievements, streaks, strongest routine habits, identify weaknesses, and provide 3 actionable goals. Maintain professional Markdown presentation with headers, list tags, and tables. 
 
@@ -2818,17 +3466,19 @@ ${getSystemContextForAI()}`;
         } else {
             // Mock async rules compiler
             setTimeout(() => {
-                reviewBox.innerHTML = generateOfflineAIReview();
+                const offlineHtml = generateOfflineAIReview();
+                if (reviewBox) reviewBox.innerHTML = offlineHtml;
+                appendReviewToChats(offlineHtml);
             }, 1800);
         }
     });
 
     // Settings Profile Forms save
-    document.getElementById('settings-personalization-form').addEventListener('submit', (e) => {
+    document.getElementById('settings-personalization-form')?.addEventListener('submit', (e) => {
         e.preventDefault();
         
-        const username = document.getElementById('settings-username').value;
-        const motivationStyle = document.getElementById('settings-motivation-style').value;
+        const username = document.getElementById('settings-username')?.value || '';
+        const motivationStyle = document.getElementById('settings-motivation-style')?.value || '';
         
         state.user.name = username;
         state.user.motivationStyle = motivationStyle;
@@ -2836,19 +3486,20 @@ ${getSystemContextForAI()}`;
         saveToLocalStorage();
         
         // Update welcome texts instantly
-        document.getElementById('welcome-title').textContent = `Good morning, ${username}!`;
+        const welcomeTitle = document.getElementById('welcome-title');
+        if (welcomeTitle) welcomeTitle.textContent = `Good morning, ${username}!`;
         
         alert("Personalized settings saved!");
     });
 
     // Sound effects toggler
-    document.getElementById('setting-sound-effects').addEventListener('change', (e) => {
+    document.getElementById('setting-sound-effects')?.addEventListener('change', (e) => {
         state.soundEffectsEnabled = e.target.checked;
         saveToLocalStorage();
     });
 
     // Browser Notification Enable click
-    document.getElementById('btn-request-notification').addEventListener('click', () => {
+    document.getElementById('btn-request-notification')?.addEventListener('click', () => {
         if (!("Notification" in window)) {
             alert("This browser does not support desktop notification");
         } else if (Notification.permission === "granted") {
@@ -2857,14 +3508,15 @@ ${getSystemContextForAI()}`;
             Notification.requestPermission().then(permission => {
                 if (permission === "granted") {
                     sendNativeNotification("Alerts Configured!", "Oumar Habits reminders initialized successfully.");
-                    document.getElementById('btn-request-notification').textContent = "Active ✓";
+                    const btn = document.getElementById('btn-request-notification');
+                    if (btn) btn.textContent = "Active ✓";
                 }
             });
         }
     });
 
     // Export Data JSON trigger
-    document.getElementById('btn-export-data').addEventListener('click', () => {
+    document.getElementById('btn-export-data')?.addEventListener('click', () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state, null, 2));
         const downloadAnchor = document.createElement('a');
         downloadAnchor.setAttribute("href", dataStr);
@@ -2875,12 +3527,12 @@ ${getSystemContextForAI()}`;
     });
 
     // Trigger select file click for import
-    document.getElementById('btn-trigger-import').addEventListener('click', () => {
-        document.getElementById('input-import-file').click();
+    document.getElementById('btn-trigger-import')?.addEventListener('click', () => {
+        document.getElementById('input-import-file')?.click();
     });
 
     // Process imported file
-    document.getElementById('input-import-file').addEventListener('change', (e) => {
+    document.getElementById('input-import-file')?.addEventListener('change', (e) => {
         const file = e.target.files[0];
         if (!file) return;
 
@@ -2905,7 +3557,7 @@ ${getSystemContextForAI()}`;
     });
 
     // Factory reset database
-    document.getElementById('btn-factory-reset').addEventListener('click', () => {
+    document.getElementById('btn-factory-reset')?.addEventListener('click', () => {
         if (confirm("Are you absolutely sure you want to restore default template data? ALL logs and homework will be wiped permanently.")) {
             localStorage.removeItem('oumar_habits_state');
             location.reload();
@@ -2914,21 +3566,23 @@ ${getSystemContextForAI()}`;
 
     // Light / Dark Theme toggle event
     const themeBtn = document.getElementById('theme-toggle');
-    themeBtn.addEventListener('click', () => {
-        const html = document.documentElement;
-        const currentTheme = html.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        html.setAttribute('data-theme', newTheme);
-        themeBtn.querySelector('.material-symbols-outlined').textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
-    });
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            const currentTheme = html.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            
+            html.setAttribute('data-theme', newTheme);
+            const icon = themeBtn.querySelector('.material-symbols-outlined');
+            if (icon) icon.textContent = newTheme === 'dark' ? 'light_mode' : 'dark_mode';
+        });
+    }
 
     // Navigate to specified target tabs on link clicks inside content panels
     document.querySelectorAll('.btn-go-tab').forEach(btn => {
         btn.addEventListener('click', () => {
             const target = btn.dataset.target;
-            const targetBtn = document.querySelector(`.app-sidebar .nav-item[data-tab="${target}"]`);
-            if (targetBtn) targetBtn.click();
+            switchTab(target);
         });
     });
 
@@ -3130,10 +3784,14 @@ ${getSystemContextForAI()}`;
     const btnAddCustomChore = document.getElementById('btn-add-custom-chore');
     if (btnAddCustomChore) {
         btnAddCustomChore.addEventListener('click', () => {
-            document.getElementById('chore-title').value = '';
-            document.getElementById('chore-frequency').value = '7';
-            document.getElementById('chore-priority').value = 'medium';
-            document.getElementById('chore-modal').classList.add('active');
+            try {
+                document.getElementById('chore-title').value = '';
+                document.getElementById('chore-frequency').value = '7';
+                document.getElementById('chore-priority').value = 'medium';
+                openModal('chore-modal');
+            } catch (err) {
+                console.error("Error launching chore modal:", err);
+            }
         });
     }
     
@@ -3141,22 +3799,27 @@ ${getSystemContextForAI()}`;
     if (choreForm) {
         choreForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const title = document.getElementById('chore-title').value.trim();
-            const frequency = parseInt(document.getElementById('chore-frequency').value);
-            const priority = document.getElementById('chore-priority').value;
-            
-            if (!state.chores) state.chores = [];
-            state.chores.push({
-                id: 'ch_' + Date.now(),
-                title: title,
-                frequency: frequency,
-                lastDone: "",
-                priority: priority
-            });
-            
-            saveToLocalStorage();
-            renderAllScreens();
-            document.getElementById('chore-modal').classList.remove('active');
+            try {
+                const title = document.getElementById('chore-title').value.trim();
+                const frequency = parseInt(document.getElementById('chore-frequency').value);
+                const priority = document.getElementById('chore-priority').value;
+                
+                if (!state.chores) state.chores = [];
+                state.chores.push({
+                    id: 'ch_' + Date.now(),
+                    title: title,
+                    frequency: frequency,
+                    lastDone: "",
+                    priority: priority
+                });
+                
+                saveToLocalStorage();
+                renderAllScreens();
+            } catch (err) {
+                console.error("Error creating chore:", err);
+            } finally {
+                closeModal('chore-modal');
+            }
         });
     }
 
@@ -3280,16 +3943,19 @@ ${getSystemContextForAI()}`;
     const btnVerifySuccessClose = document.getElementById('btn-verify-success-close');
     if (btnVerifySuccessClose) {
         btnVerifySuccessClose.addEventListener('click', () => {
-            document.getElementById('school-verify-modal').classList.remove('active');
-            
-            // Increment XP points dynamically!
-            if (state.userPoints !== undefined) {
-                state.userPoints += 50;
-            } else {
-                state.userPoints = 50;
+            try {
+                if (state.userPoints !== undefined) {
+                    state.userPoints += 50;
+                } else {
+                    state.userPoints = 50;
+                }
+                saveToLocalStorage();
+                renderAllScreens();
+            } catch (err) {
+                console.error("Error closing verification modal:", err);
+            } finally {
+                closeModal('school-verify-modal');
             }
-            saveToLocalStorage();
-            renderAllScreens();
         });
     }
     
@@ -3309,6 +3975,7 @@ ${getSystemContextForAI()}`;
     // Initialize display values
     updateTimerDisplay();
     renderAllScreens();
+    triggerSkeletonLoad('dashboard');
 });
 
 // --- DeviceControlService Abstraction Layer & Accountability Controller ---
@@ -3688,4 +4355,6 @@ window.onWeeklyReviewCallback = function(rawReviewHtml) {
             ${parsedHtml}
         </div>
     `;
+    
+    appendReviewToChats(parsedHtml);
 };

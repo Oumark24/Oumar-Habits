@@ -15,7 +15,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons&display=swap" rel="stylesheet">
     
     <!-- Stylesheet -->
     <link rel="stylesheet" href="style.css">
@@ -53,39 +54,46 @@
         <div class="app-main">
             <!-- Sidebar Navigation (Desktop/Tablet) -->
             <nav class="app-sidebar">
+                <div class="sidebar-section-title">MAIN NAVIGATION</div>
                 <button class="nav-item active" data-tab="dashboard">
-                    <span class="material-symbols-outlined">dashboard</span>
-                    <span>Dashboard</span>
+                    <span class="material-symbols-outlined">today</span>
+                    <span>Today</span>
                 </button>
-                <button class="nav-item" data-tab="habits">
+                <button class="nav-item" data-tab="hub">
+                    <span class="material-symbols-outlined">grid_view</span>
+                    <span>Studio Hub</span>
+                </button>
+
+                <div class="sidebar-section-title" style="margin-top: 16px;">STUDIO SHORTCUTS</div>
+                <button class="nav-shortcut-item" data-hub-target="habits">
                     <span class="material-symbols-outlined">pageview</span>
-                    <span>Habits</span>
+                    <span>Habits & Routines</span>
                 </button>
-                <button class="nav-item" data-tab="pomodoro">
+                <button class="nav-shortcut-item" data-hub-target="pomodoro">
                     <span class="material-symbols-outlined">timer</span>
                     <span>Focus Timer</span>
                 </button>
-                <button class="nav-item" data-tab="school">
+                <button class="nav-shortcut-item" data-hub-target="school">
                     <span class="material-symbols-outlined">school</span>
                     <span>School Planner</span>
                 </button>
-                <button class="nav-item" data-tab="prayers">
+                <button class="nav-shortcut-item" data-hub-target="prayers">
                     <span class="material-symbols-outlined">mosque</span>
                     <span>Prayers & Anchors</span>
                 </button>
-                <button class="nav-item" data-tab="journal">
+                <button class="nav-shortcut-item" data-hub-target="journal">
                     <span class="material-symbols-outlined">edit_note</span>
-                    <span>Mood & Journal</span>
+                    <span>Mind & Reflection</span>
                 </button>
-                <button class="nav-item" data-tab="ai-coach">
+                <button class="nav-shortcut-item" data-hub-target="ai-coach">
                     <span class="material-symbols-outlined">smart_toy</span>
                     <span>AI Habit Coach</span>
                 </button>
-                <button class="nav-item" data-tab="challenges">
+                <button class="nav-shortcut-item" data-hub-target="challenges">
                     <span class="material-symbols-outlined">workspace_premium</span>
-                    <span>Challenges</span>
+                    <span>Milestones</span>
                 </button>
-                <button class="nav-item" data-tab="settings">
+                <button class="nav-shortcut-item" data-hub-target="settings">
                     <span class="material-symbols-outlined">settings</span>
                     <span>Settings</span>
                 </button>
@@ -313,8 +321,52 @@
                     </div>
                 </section>
 
-                <!-- 2. HABITS SCREEN -->
-                <section id="tab-habits" class="tab-panel">
+                <!-- 2. STUDIO HUB SCREEN -->
+                <section id="tab-hub" class="tab-panel">
+                    <div class="hub-header">
+                        <div class="hub-title-group">
+                            <h2 class="hub-title">Studio Hub</h2>
+                            <p class="hub-subtitle">Your central workspace for habits, focus, academics, spirituality, and mindset.</p>
+                        </div>
+                        
+                        <div class="hub-segmented-bar">
+                            <button class="hub-pill active" data-hub-tab="habits">
+                                <span class="material-symbols-outlined">pageview</span>
+                                <span>Habits</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="pomodoro">
+                                <span class="material-symbols-outlined">timer</span>
+                                <span>Focus</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="school">
+                                <span class="material-symbols-outlined">school</span>
+                                <span>School</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="prayers">
+                                <span class="material-symbols-outlined">mosque</span>
+                                <span>Prayers</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="journal">
+                                <span class="material-symbols-outlined">edit_note</span>
+                                <span>Mind</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="ai-coach">
+                                <span class="material-symbols-outlined">smart_toy</span>
+                                <span>AI Coach</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="challenges">
+                                <span class="material-symbols-outlined">workspace_premium</span>
+                                <span>Badges</span>
+                            </button>
+                            <button class="hub-pill" data-hub-tab="settings">
+                                <span class="material-symbols-outlined">settings</span>
+                                <span>Settings</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Hub Subpanel 1: Habits -->
+                    <div id="tab-habits" class="hub-subpanel active">
                     <div class="screen-header">
                         <div>
                             <h2>Habit Vault</h2>
@@ -353,10 +405,10 @@
                             <!-- Populated dynamically -->
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- 3. FOCUS TIMER SCREEN -->
-                <section id="tab-pomodoro" class="tab-panel">
+                <!-- Hub Subpanel 2: Pomodoro -->
+                <div id="tab-pomodoro" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>Pomodoro Focus Timer</h2>
@@ -475,18 +527,23 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- 4. SCHOOL PLANNER SCREEN -->
-                <section id="tab-school" class="tab-panel">
+                <!-- Hub Subpanel 3: School -->
+                <div id="tab-school" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>School Planner</h2>
-                            <p>Organize homework, quizzes, projects, exams, and milestones.</p>
+                            <p>Organize homework, quizzes, projects, exams, subjects, and milestones.</p>
                         </div>
-                        <button id="add-school-task-btn" class="primary-button">
-                            <span class="material-symbols-outlined">add</span> Add Task
-                        </button>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <button id="add-subject-btn" class="secondary-button" style="display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; font-size: 12px; border-radius: var(--border-radius-md);">
+                                <span class="material-symbols-outlined" style="font-size: 16px;">library_add</span> Add Subject
+                            </button>
+                            <button id="add-school-task-btn" class="primary-button">
+                                <span class="material-symbols-outlined">add</span> Add Task
+                            </button>
+                        </div>
                     </div>
 
                     <div class="school-layout">
@@ -527,10 +584,10 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- 4.5 PRAYERS & ANCHORS SCREEN -->
-                <section id="tab-prayers" class="tab-panel">
+                <!-- Hub Subpanel 4: Prayers -->
+                <div id="tab-prayers" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>Prayers & Anchor Points</h2>
@@ -654,10 +711,10 @@
                          </div>
                          
                      </div>
-                 </section>
+                 </div>
 
-                 <!-- 5. MOOD & JOURNAL SCREEN -->
-                <section id="tab-journal" class="tab-panel">
+                 <!-- Hub Subpanel 5: Journal -->
+                <div id="tab-journal" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>Reflections & Mood Journal</h2>
@@ -750,10 +807,10 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- 6. AI HABIT COACH SCREEN -->
-                <section id="tab-ai-coach" class="tab-panel">
+                <!-- Hub Subpanel 6: AI Coach -->
+                <div id="tab-ai-coach" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>AI Life Assistant & Habit Coach</h2>
@@ -821,10 +878,10 @@
                             </div>
                         </div>
                     </div>
-                </section>
+                </div>
 
-                <!-- 7. CHALLENGES & ACHIEVEMENTS SCREEN -->
-                <section id="tab-challenges" class="tab-panel">
+                <!-- Hub Subpanel 7: Challenges -->
+                <div id="tab-challenges" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>Challenges & Badges</h2>
@@ -843,10 +900,10 @@
                     <div class="badges-grid" id="badges-container">
                         <!-- Populated dynamically -->
                     </div>
-                </section>
+                </div>
 
-                <!-- 8. SETTINGS SCREEN -->
-                <section id="tab-settings" class="tab-panel">
+                <!-- Hub Subpanel 8: Settings -->
+                <div id="tab-settings" class="hub-subpanel">
                     <div class="screen-header">
                         <div>
                             <h2>Settings & Sync</h2>
@@ -938,39 +995,20 @@
                             </div>
                         </div>
                     </div>
+                </div>
                 </section>
             </main>
         </div>
 
-        <!-- Navigation Bar (Mobile bottom nav) -->
+        <!-- Navigation Bar (Mobile bottom nav - 2 Tabs) -->
         <nav class="app-bottom-nav">
             <button class="nav-item active" data-tab="dashboard">
-                <span class="material-symbols-outlined">dashboard</span>
-                <span>Home</span>
+                <span class="material-symbols-outlined">today</span>
+                <span>Today</span>
             </button>
-            <button class="nav-item" data-tab="habits">
-                <span class="material-symbols-outlined">pageview</span>
-                <span>Habits</span>
-            </button>
-            <button class="nav-item" data-tab="pomodoro">
-                <span class="material-symbols-outlined">timer</span>
-                <span>Focus</span>
-            </button>
-            <button class="nav-item" data-tab="school">
-                <span class="material-symbols-outlined">school</span>
-                <span>School</span>
-            </button>
-            <button class="nav-item" data-tab="prayers">
-                <span class="material-symbols-outlined">mosque</span>
-                <span>Prayers</span>
-            </button>
-            <button class="nav-item" data-tab="journal">
-                <span class="material-symbols-outlined">edit_note</span>
-                <span>Mind</span>
-            </button>
-            <button class="nav-item" data-tab="ai-coach">
-                <span class="material-symbols-outlined">smart_toy</span>
-                <span>AI Coach</span>
+            <button class="nav-item" data-tab="hub">
+                <span class="material-symbols-outlined">grid_view</span>
+                <span>Studio Hub</span>
             </button>
         </nav>
     </div>
@@ -1151,7 +1189,8 @@
                 <div class="form-row">
                     <div class="form-group">
                         <label for="school-subject">Subject</label>
-                        <input type="text" id="school-subject" placeholder="e.g. MATH101, PHYS202...">
+                        <input type="text" id="school-subject" list="subjects-datalist" placeholder="e.g. MATH101, PHYS202...">
+                        <datalist id="subjects-datalist"></datalist>
                     </div>
                 </div>
 
@@ -1324,6 +1363,32 @@
                 </div>
                 <button type="button" class="primary-button" id="btn-verify-success-close" style="width: 100%;">Cleared! +50 XP</button>
             </div>
+        </div>
+    </div>
+
+    <!-- F. ADD NEW SUBJECT MODAL -->
+    <div id="subject-modal" class="modal-overlay">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3 id="subject-modal-title">Add New Subject</h3>
+                <button type="button" class="icon-button modal-close" data-modal="subject-modal">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="subject-form" class="modal-body">
+                <div class="form-group">
+                    <label for="subject-name">Subject Name / Course Code *</label>
+                    <input type="text" id="subject-name" required placeholder="e.g. MATH101, PHYS202, Computer Science...">
+                </div>
+                <div class="form-group">
+                    <label for="subject-instructor">Instructor / Professor (Optional)</label>
+                    <input type="text" id="subject-instructor" placeholder="e.g. Dr. Alan Smith">
+                </div>
+                <div class="modal-actions">
+                    <button type="button" class="secondary-button modal-close" data-modal="subject-modal">Cancel</button>
+                    <button type="submit" class="primary-button">Save Subject</button>
+                </div>
+            </form>
         </div>
     </div>
 
